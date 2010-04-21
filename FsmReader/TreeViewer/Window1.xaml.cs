@@ -89,12 +89,12 @@ namespace TreeViewer {
 		Treenode cppNode = null;
 		
 		private void NextCppNode_Click(object sender, RoutedEventArgs e) {
-			cppNode = dpt.FindNode(s => (s.flags & Flags.CPPFUNC) == Flags.CPPFUNC);
+			cppNode = dpt.FindNode(s => (s.Flags & Flags.CppFunc) == Flags.CppFunc);
 			//cppNode = Treenode.FindNodeWithFlags(left, cppNode, Flags.CPPFUNC);
 			
 			if (cppNode != null) {
 				leftTree.SelectNode(cppNode);
-				//leftText.Text = cppNode.DataAsString();
+				leftText.Text = cppNode.DataAsString();
 			}
 		}
 

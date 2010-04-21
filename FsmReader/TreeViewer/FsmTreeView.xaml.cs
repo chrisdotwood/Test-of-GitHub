@@ -62,7 +62,7 @@ namespace TreeViewer {
 			Treenode parent = target;
 			while (parent != null) {
 				ancestors.Push(parent);
-				parent = parent.parent;
+				parent = parent.Parent;
 			}
 
 			TreenodeView item = null;
@@ -179,15 +179,15 @@ namespace TreeViewer {
 
 		public string IconPath {
 			get {
-				if (Treenode.datatype == DataType.OBJECT) {
+				if (Treenode.DataType == DataType.Object) {
 					return "Images/Object.png";
-				} else if ((Treenode.flags & Flags.CPPFUNC) == Flags.CPPFUNC) {
+				} else if ((Treenode.Flags & Flags.CppFunc) == Flags.CppFunc) {
 					return "Images/CPP.png";
-				} else if ((Treenode.flagsEx & FlagsExtended.DLLFUNC) == FlagsExtended.DLLFUNC) {
+				} else if ((Treenode.ExtendedFlags & FlagsExtended.DLLFunc) == FlagsExtended.DLLFunc) {
 					return "Images/DLL.png";
-				} else if ((Treenode.flagsEx & FlagsExtended.GLOBALCPPFUNC) == FlagsExtended.GLOBALCPPFUNC) {
+				} else if ((Treenode.ExtendedFlags & FlagsExtended.GlobalCPPFunc) == FlagsExtended.GlobalCPPFunc) {
 					return "Images/GlobalCPP.png";
-				} else if((Treenode.flagsEx & FlagsExtended.FLEXSCRIPT) == FlagsExtended.FLEXSCRIPT) {
+				} else if((Treenode.ExtendedFlags & FlagsExtended.FlexScript) == FlagsExtended.FlexScript) {
 					return "Images/Flexscript.png";
 				} else {
 					if(Treenode.NodeChildren.Count > 0) {

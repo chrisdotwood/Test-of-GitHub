@@ -18,6 +18,7 @@ namespace FsmReader {
 		public Treenode FindNode(Func<Treenode, bool> predicate) {
 			this.predicate = predicate;
 			result = null;
+			Stack<int> stack = new Stack<int>();
 
 			root.Accept(this, ref stack);
 
@@ -29,8 +30,6 @@ namespace FsmReader {
 
 		#region IVisitor Members
 
-		Stack<Composite> stack = new Stack<Composite>();
-		Queue<Composite> queue = new Queue<Composite>();
 
 		public bool VisitEnter(Composite composite) {
 			Treenode node = (Treenode)composite;

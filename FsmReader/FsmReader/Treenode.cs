@@ -4,93 +4,96 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace FsmReader {
 	#region Enums
 
 	public enum DataType {
-		FLOAT = 1,
-		BYTEBLOCK = 2,
-		POINTERCOUPLING = 3,
-		OBJECT = 4,
-		PARTICLE = 5
+		None = 0,
+		Float = 1,
+		ByteBlock = 2,
+		PointerCoupling = 3,
+		Object = 4,
+		Particle = 5
 	}
 	[Flags]
 	public enum Flags {
-		EXPANDED = 0x01,
-		HASOWNER = 0x02,
-		CPPFUNC = 0x04,
-		SELECTED = 0x08,
-		HIDECONNECTORS = 0x10,
-		HIDELABEL = 0x20,
-		EXTENDEDFLAGS = 0x40,
-		EXTENDEDFLAGS_A = 0x80
+		Expanded = 0x01,
+		HasOwner = 0x02,
+		CppFunc = 0x04,
+		Selected = 0x08,
+		HideConnectors = 0x10,
+		HideLabel = 0x20,
+		ExtendedFlags = 0x40,
+		ExtendedFlagsA = 0x80
 	}
 
 	[Flags]
 	public enum FlagsExtended {
-		SHOWOBJECT = 0x00000001,
-		SELECTED = 0x00000002,
-		FLEXSCRIPT = 0x00000004,
-		NULL = 0x00000008,
+		ShowObject = 0x00000001,
+		Selected = 0x00000002,
+		FlexScript = 0x00000004,
+		Null = 0x00000008,
 
-		FUNCTIONDISABLED = 0x00000010,
-		KEYWORD = 0x00000020,
-		STATELOCKED = 0x00000040, // first used for port state-change masking
-		HIDDEN = 0x00000080, // prevent user viewing
+		FunctionDisabled = 0x00000010,
+		Keyword = 0x00000020,
+		StateLocked = 0x00000040, // first used for port state-change masking
+		Hidden = 0x00000080, // prevent user viewing
 
-		PROTECTED = 0x00000100, // prevent user editing
-		HIDESHAPE = 0x00000200,
-		ODTDERIVATIVE = 0x00000400,
-		HIDEBASE = 0x00000800,
+		Protected = 0x00000100, // prevent user editing
+		HideShape = 0x00000200,
+		ODTDerivative = 0x00000400,
+		HideBase = 0x00000800,
 
-		HIDECONTENT = 0x00001000,
-		STATSTAG = 0x00002000,
-		INDEXCACHE = 0x00004000,
-		MAINTAINARRAY = 0x00008000,
+		HideContent = 0x00001000,
+		StatStag = 0x00002000,
+		IndexCache = 0x00004000,
+		MaintainArray = 0x00008000,
 
-		DLLFUNC = 0x00010000,
-		CUSTOMDISPLAY = 0x00020000,
-		GLOBALCPPFUNC = 0x00040000,
-		EXECUTINGNOW = 0x00080000
+		DLLFunc = 0x00010000,
+		CustomDisplay = 0x00020000,
+		GlobalCPPFunc = 0x00040000,
+		ExecutingNow = 0x00080000
 	}
 
 	#endregion
 
 	public class Treenode : Composite {
-		byte version;
-		public Flags flags;
+		byte Version { get; set; }
+		public Flags Flags { get; set; }
 		public string Title {
 			get;
 			set;
 		}
-		public object data;
+		private object data;
 
-		public DataType datatype;
-		public uint branch;
-		public FlagsExtended flagsEx;
-		public uint indexCache;
-		public uint cppType;
+		public DataType DataType { get; set; }
+		public uint Branch { get; set; }
+		public FlagsExtended ExtendedFlags { get; set; }
+		public uint IndexCache { get; set; }
+		public uint CppType { get; set; }
 
-		public uint size;
+		public uint Size { get; set; }
 
-		public List<Treenode> dataChildren = new List<Treenode>();
-		public List<Treenode> NodeChildren {
+		//public List<Treenode> dataChildren = new List<Treenode>();
+		public Collection<Treenode> NodeChildren {
 			get;
 			private set;
 		}
 
 		public Treenode() {
-			NodeChildren = new List<Treenode>();
+			NodeChildren = new Collection<Treenode>();
 		}
 
-		public override List<Composite> Children {
+		public override ReadOnlyCollection<Composite> Children {
 			get {
-				return NodeChildren.Cast<Composite>().ToList();
+				IList<Composite> c = NodeChildren.ToList<Composite>();
+				return new ReadOnlyCollection<Composite>(c);
 			}
 		}
 
-		public Treenode parent;
+		public Treenode Parent { get; set; }
 
 		public string DataAsString() {
 			if (data != null) {
@@ -104,10 +107,10 @@ namespace FsmReader {
 			get {
 				string path = "/" + Title;
 
-				Treenode up = parent;
+				Treenode up = Parent;
 				while (up != null) {
 					path = "/" + up.Title + path;
-					up = up.parent;
+					up = up.Parent;
 				}
 				return path;
 			}
@@ -133,6 +136,9 @@ namespace FsmReader {
 		/// <param name="relativeTo">The starting node for the search.</param>
 		/// <returns>The Treenode if it is found, null otherwise.</returns>
 		public static Treenode NodeFromPath(string path, Treenode relativeTo) {
+			if (path == null) throw new ArgumentException("path");
+			if(relativeTo == null) throw new ArgumentException("relativeTo");
+
 			string[] parts = path.Split(new char[] { '/' });
 
 			Treenode node = relativeTo;
@@ -150,31 +156,31 @@ namespace FsmReader {
 
 			Treenode ret = new Treenode();
 
-			ret.version = reader.ReadByte();
-			ret.flags = (Flags)Enum.ToObject(typeof(DataType), reader.ReadByte());
+			ret.Version = reader.ReadByte();
+			ret.Flags = (Flags)Enum.ToObject(typeof(DataType), reader.ReadByte());
 
 			int len = reader.ReadInt32();
 			if (len > 0) {
 				ret.Title = new string(reader.ReadChars((int)len)).Replace("\0", "");
 			}
 
-			ret.datatype = (DataType)Enum.ToObject(typeof(DataType), reader.ReadUInt32());
+			ret.DataType = (DataType)Enum.ToObject(typeof(DataType), reader.ReadUInt32());
 
-			ret.branch = reader.ReadUInt32();
+			ret.Branch = reader.ReadUInt32();
 
-			if ((ret.flags & Flags.EXTENDEDFLAGS) == Flags.EXTENDEDFLAGS) {
-				ret.flagsEx = (FlagsExtended)Enum.ToObject(typeof(FlagsExtended), reader.ReadUInt32());
+			if ((ret.Flags & Flags.ExtendedFlags) == Flags.ExtendedFlags) {
+				ret.ExtendedFlags = (FlagsExtended)Enum.ToObject(typeof(FlagsExtended), reader.ReadUInt32());
 			}
 
-			if ((ret.flagsEx & FlagsExtended.ODTDERIVATIVE) == FlagsExtended.ODTDERIVATIVE) {
-				ret.cppType = reader.ReadUInt32();
+			if ((ret.ExtendedFlags & FlagsExtended.ODTDerivative) == FlagsExtended.ODTDerivative) {
+				ret.CppType = reader.ReadUInt32();
 			}
 
-			if ((ret.flagsEx & FlagsExtended.INDEXCACHE) == FlagsExtended.INDEXCACHE) {
-				ret.indexCache = reader.ReadUInt32();
+			if ((ret.ExtendedFlags & FlagsExtended.IndexCache) == FlagsExtended.IndexCache) {
+				ret.IndexCache = reader.ReadUInt32();
 			}
 
-			if (ret.datatype == DataType.BYTEBLOCK) {
+			if (ret.DataType == DataType.ByteBlock) {
 				len = reader.ReadInt32();
 				if (len > 0) {
 					byte[] buf = new byte[len];
@@ -184,24 +190,24 @@ namespace FsmReader {
 				}
 			}
 
-			if (ret.datatype == DataType.FLOAT) {
+			if (ret.DataType == DataType.Float) {
 				ret.data = reader.ReadDouble();
 			}
 
-			if (ret.datatype == DataType.POINTERCOUPLING) {
+			if (ret.DataType == DataType.PointerCoupling) {
 				ret.data = reader.ReadUInt32();
 			}
 
-			if (ret.branch > 0) {
+			if (ret.Branch > 0) {
 				Treenode dataChild = Read(stream);
 
-				uint dataNodesToRead = dataChild.size;
+				uint dataNodesToRead = dataChild.Size;
 
 				while (dataNodesToRead-- > 0) {
 					Treenode node = Read(stream);
-					node.parent = ret;
+					node.Parent = ret;
 
-					if (ret.datatype == DataType.OBJECT) {
+					if (ret.DataType == DataType.Object) {
 						//ret.dataChildren.Add(node);
 						ret.NodeChildren.Add(node);
 					} else {
@@ -210,28 +216,28 @@ namespace FsmReader {
 				}
 			}
 
-			if (ret.datatype == DataType.OBJECT) {
+			if (ret.DataType == DataType.Object) {
 				Treenode dataChild = Read(stream);
 
-				uint nodesToRead = dataChild.size;
+				uint nodesToRead = dataChild.Size;
 
 				while (nodesToRead-- > 0) {
 					Treenode node = Read(stream);
-					node.parent = ret;
+					node.Parent = ret;
 
-					if (ret.branch > 0) {
+					if (ret.Branch > 0) {
 						//ret.dataChildren.Add(node);
 						ret.NodeChildren.Add(node);
 					} else {
 						ret.NodeChildren.Add(node);
 					}
 				}
-			} else if (ret.datatype == DataType.PARTICLE) {
-				Console.WriteLine("ERROR: Unknown datatype: " + ret.datatype.ToString() + " at " + stream.Position);
+			} else if (ret.DataType == DataType.Particle) {
+				Console.WriteLine("ERROR: Unknown datatype: " + ret.DataType.ToString() + " at " + stream.Position);
 			}
 
-			if ((ret.flags & Flags.HASOWNER) != Flags.HASOWNER) {
-				ret.size = reader.ReadUInt32();
+			if ((ret.Flags & Flags.HasOwner) != Flags.HasOwner) {
+				ret.Size = reader.ReadUInt32();
 			}
 			return ret;
 		}

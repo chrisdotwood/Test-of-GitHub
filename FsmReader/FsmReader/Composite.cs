@@ -3,43 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace FsmReader {
 	public abstract class Composite {
-		public abstract List<Composite> Children {
+		public abstract ReadOnlyCollection<Composite> Children {
 			get;
-		}
-
-		public bool Accept2(IVisitor visitor, Queue<Composite> queue) {
-			Console.WriteLine("-------- Accept ------");
-			foreach (Composite c in queue) {
-				Console.WriteLine(((Treenode)c).Title);
-			}
-			Console.WriteLine("----------------------");
-
-			if (visitor.VisitEnter(this)) {
-
-				foreach (Composite c in Children) {
-					if (!c.Accept2(visitor, queue)) {
-						break;
-					} else {
-						queue.Enqueue(this);
-					}
-				}
-
-			}
-			bool ret = visitor.VisitExit(this);
-			return ret;
 		}
 
 		static int acceptCount;
 
-		public bool Accept(IVisitor visitor, ref Stack<Composite> stack) {
-			Stack<Composite> inStack = new Stack<Composite>();
+		public bool Accept(IVisitor visitor, ref Stack<int> stack) {
+			Stack<int> inStack = new Stack<int>();
 			acceptCount = 0;
 			
 			// Reverse the stack
-			Stack<Composite> resumeStack = new Stack<Composite>(stack.AsEnumerable());
+			Stack<int> resumeStack = new Stack<int>(stack.AsEnumerable());
 			// Remove root element
 			if (resumeStack.Count > 0) resumeStack.Pop();
 
@@ -48,45 +27,39 @@ namespace FsmReader {
 			stack = inStack;
 
 			Console.WriteLine("--------------------------------");
-			foreach (Composite c in stack) {
-				Console.WriteLine(((Treenode)c).Title);
+			foreach (int c in stack) {
+				Console.WriteLine(c);
 			}
 			Console.WriteLine("--------------------------------");
 
-			Console.WriteLine("AcceptCount = " + acceptCount);
+			Console.WriteLine("Accept Count = " + acceptCount);
 			return result;
 		}
 
-		private bool Accept(IVisitor visitor, Stack<Composite> inStack, Stack<Composite> resumeStack) {
+		private bool Accept(IVisitor visitor, Stack<int> inStack, Stack<int> resumeStack) {
 			acceptCount++;
 			if (visitor.VisitEnter(this)) {
-				inStack.Push(this);
 
 				int firstChild = 0;
 
 				if (resumeStack.Count > 0) {
-					Composite top = resumeStack.Pop();
-					if (resumeStack.Count == 0) {
-						// Top was the result last time
-						firstChild = Children.IndexOf(top) + 1;
-					} else {
-						top.Accept(visitor, inStack, resumeStack);
-						firstChild = int.MaxValue;
-					}
+					firstChild = resumeStack.Pop();
+					if (resumeStack.Count == 0) firstChild++;
 				}
 
 				for (int i = firstChild; i < Children.Count; i++) {
+					inStack.Push(i);
+
 					Composite c = Children[i];
 					if (!c.Accept(visitor, inStack, resumeStack)) {
 						break;
+					} else {
+						inStack.Pop();
 					}
 				}
 			}
 
 			bool ret = visitor.VisitExit(this);
-			if (ret) {
-				inStack.Pop();
-			}
 			return ret;
 		}
 
