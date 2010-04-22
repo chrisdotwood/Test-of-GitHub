@@ -28,39 +28,5 @@ namespace TreeViewer {
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
 		}
-
-		//private void leftTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
-		//    TreenodeView node = ((FsmTreeView)sender).SelectedItem;
-		//    if (node == null) {
-		//        leftText.Text = "";
-		//        leftTreePath.Text = "No Node Selected";
-
-		//    } else {
-		//        leftText.Text = node.Treenode.DataAsString();
-		//        leftTreePath.Text = node.Treenode.FullPath;
-
-		//        //select lines 3 to 5
-		//        if (leftText.Document.LineCount > 5) {
-		//            int start = leftText.Document.GetLineByNumber(3).Offset;
-		//            int end = leftText.Document.GetLineByNumber(5).EndOffset;
-		//            leftText.Select(start, end - start);
-		//        }
-		//    }
-		//}
-
-		Treenode cppNode = null;
-		
-		//private void NextCppNode_Click(object sender, RoutedEventArgs e) {
-		//    cppNode = dpt.FindNode(s => (s.Flags & Flags.CppFunc) == Flags.CppFunc);
-		//    //cppNode = Treenode.FindNodeWithFlags(left, cppNode, Flags.CPPFUNC);
-			
-		//    if (cppNode != null) {
-		//        leftTree.SelectNode(cppNode);
-		//    } 
-		//}
-
-		private void leftTreePath_MouseUp(object sender, MouseButtonEventArgs e) {
-			//((TreeViewItem)leftTree.tree.SelectedItem).BringIntoView();
-		}
 	}
 }

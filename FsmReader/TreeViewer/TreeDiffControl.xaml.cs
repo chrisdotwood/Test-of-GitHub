@@ -82,8 +82,12 @@ namespace TreeViewer {
 		}
 
 		private void DiffCode() {
-		//	new Lcs().Diff(new DiffDocument(LeftCodeText.Text), new DiffDocument(RightCodeText.Text));
+			List<Change> changes = new Lcs().Diff(new DiffDocument(LeftCodeText.Text), new DiffDocument(RightCodeText.Text));
 
+			foreach (Change c in changes) {
+				Console.WriteLine(c.ToString());
+				Console.WriteLine("----------------------------------------------------------------------------");
+			}
 		}
 
 		private void RightFsmTree_SelectedItemChanged(object sender, RoutedEventArgs e) {

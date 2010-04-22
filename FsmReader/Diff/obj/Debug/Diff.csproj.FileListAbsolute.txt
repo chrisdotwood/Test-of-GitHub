@@ -8,3 +8,8 @@ C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of
 C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\obj\Debug\ResolveAssemblyReference.cache
 C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\obj\Debug\Diff.dll
 C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\obj\Debug\Diff.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\bin\Debug\Diff.dll
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\bin\Debug\Diff.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\obj\Debug\Diff.dll
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\obj\Debug\Diff.pdb
