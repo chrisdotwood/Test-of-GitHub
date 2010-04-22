@@ -25,13 +25,13 @@ namespace TreeViewer {
 			InitializeComponent();
 		}
 
-		public Treenode SelectedItem {
-			get { return (Treenode)GetValue(SelectedItemProperty); }
+		public TreenodeView SelectedItem {
+			get { return (TreenodeView)GetValue(SelectedItemProperty); }
 			private set { SetValue(SelectedItemProperty, value); }
 		}
 
 		public static readonly DependencyProperty SelectedItemProperty =
-			DependencyProperty.Register("SelectedItem", typeof(Treenode), typeof(FsmTreeView),
+			DependencyProperty.Register("SelectedItem", typeof(TreenodeView), typeof(FsmTreeView),
 			new UIPropertyMetadata() {
 				DefaultValue = null,
 				PropertyChangedCallback = new PropertyChangedCallback(SelectedItemPropertyChanged)
@@ -91,8 +91,9 @@ namespace TreeViewer {
 				}
 			}
 			item.IsSelected = true;
+			SelectedItem = item;
 		}
-
+		
 		private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
 			tree.ItemsSource = new ObservableCollection<TreenodeView> { new TreenodeView((Treenode)e.NewValue, null) };
 		}
@@ -101,7 +102,7 @@ namespace TreeViewer {
 			if (tree.SelectedItem == null) {
 				SelectedItem = null;
 			} else {
-				SelectedItem = ((TreenodeView)tree.SelectedItem).Treenode;
+				SelectedItem = (TreenodeView)tree.SelectedItem;
 			}
 		}
 	}

@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="TreeViewer.TreeCodeBrowser"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:local="clr-namespace:TreeViewer"
+			 xmlns:avalon="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<local:FsmTreeView x:Name="FsmTree" Margin="5" SelectedItemChanged="FsmTree_SelectedItemChanged"/>
+		<GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Grid.Row="0" Height="2"/>
+		<DockPanel Grid.Row="1">
+			<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Name="TreePath" Background="LightGray"/>
+			<avalon:TextEditor DockPanel.Dock="Bottom" Grid.Row="1" Margin="5" Name="CodeText" FontFamily="Consolas"/>
+		</DockPanel>
+	</Grid>
+</UserControl>

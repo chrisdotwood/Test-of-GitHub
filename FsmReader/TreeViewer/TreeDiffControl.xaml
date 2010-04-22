@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="TreeViewer.TreeDiffControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:TreeViewer"
+			 xmlns:avalon="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+	<UserControl.CommandBindings>
+		<CommandBinding Command="Open" CanExecute="OpenCommandBinding_CanExecute" Executed="OpenCommandBinding_Executed"/>
+	</UserControl.CommandBindings>
+	<DockPanel>
+		<ToolBar DockPanel.Dock="Top">
+			<Button Margin="3" Command="Open">Open</Button>
+		</ToolBar>
+		<Grid DockPanel.Dock="Bottom">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<local:FsmTreeView x:Name="LeftFsmTree" Margin="5" SelectedItemChanged="LeftFsmTree_SelectedItemChanged" Grid.Row="0" Grid.Column="0" />
+			<local:FsmTreeView x:Name="RightFsmTree" Margin="5" SelectedItemChanged="RightFsmTree_SelectedItemChanged" Grid.Row="0" Grid.Column="1"/>
+			<DockPanel Grid.Row="1" Grid.Column="0">
+				<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Name="LeftTreePath" Background="LightGray"/>
+				<avalon:TextEditor DockPanel.Dock="Bottom" Grid.Row="1" Margin="5" Name="LeftCodeText" FontFamily="Consolas"/>
+			</DockPanel>
+			<GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="2" Grid.ColumnSpan="2"/>
+			<GridSplitter HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="2" Grid.RowSpan="2"/>
+			<DockPanel Grid.Row="1" Grid.Column="1">
+				<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Name="RightTreePath" Background="LightGray"/>
+				<avalon:TextEditor DockPanel.Dock="Bottom" Grid.Row="1" Margin="5" Name="RightCodeText" FontFamily="Consolas"/>
+			</DockPanel>
+		</Grid>
+	</DockPanel>
+</UserControl>
