@@ -15,6 +15,7 @@ using FsmReader;
 using System.IO;
 using Microsoft.Win32;
 using ICSharpCode.AvalonEdit.Highlighting;
+using System.ComponentModel;
 
 namespace TreeViewer {
 	/// <summary>
@@ -25,78 +26,38 @@ namespace TreeViewer {
 			InitializeComponent();
 		}
 
-		Treenode left = null;
-		Treenode right = null;
-		DepthFirstSearch dpt;
-
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
-			leftText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
-
-			OpenFileDialog ofd = new OpenFileDialog();
-			bool? result = ofd.ShowDialog();
-			if (result.HasValue && result.Value == true) {
-				using (FileStream stream = new FileStream(ofd.FileName, FileMode.Open)) {
-					left = Treenode.Read(stream);
-
-					leftTree.DataContext = left;
-					dpt = new DepthFirstSearch(left);
-				}
-			} else {
-				Close();
-				return;
-			}
-
-			//result = ofd.ShowDialog();
-			//if (result.HasValue && result.Value == true) {
-			//    using (FileStream stream = new FileStream(ofd.FileName, FileMode.Open)) {
-			//        right = Treenode.Read(stream);
-
-			//        rightTree.DataContext = right;
-			//    }
-			//} else {
-			//    Close();
-			//    return;
-			//}
 		}
 
-		private void leftTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
-			Treenode node = ((FsmTreeView)sender).SelectedItem;
-			leftText.Text = node.DataAsString();
-			leftTreePath.Text = node.FullPath;
+		//private void leftTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
+		//    TreenodeView node = ((FsmTreeView)sender).SelectedItem;
+		//    if (node == null) {
+		//        leftText.Text = "";
+		//        leftTreePath.Text = "No Node Selected";
 
-			//select lines 3 to 5
-			if (leftText.Document.LineCount > 5) {
-				int start = leftText.Document.GetLineByNumber(3).Offset;
-				int end = leftText.Document.GetLineByNumber(5).EndOffset;
-				leftText.Select(start, end - start);
-			}
-		}
+		//    } else {
+		//        leftText.Text = node.Treenode.DataAsString();
+		//        leftTreePath.Text = node.Treenode.FullPath;
 
-		private void rightTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
-			
-		}
-
-		private void Button_Click(object sender, RoutedEventArgs e) {
-			TreeView view = leftTree.tree;
-			
-			TreeViewItem model = (TreeViewItem)view.Items[view.Items.Count - 1];
-			
-			TreeViewItem target = (TreeViewItem)model.Items[model.Items.Count - 1];
-			target.BringIntoView();
-			target.IsSelected = true;
-		}
+		//        //select lines 3 to 5
+		//        if (leftText.Document.LineCount > 5) {
+		//            int start = leftText.Document.GetLineByNumber(3).Offset;
+		//            int end = leftText.Document.GetLineByNumber(5).EndOffset;
+		//            leftText.Select(start, end - start);
+		//        }
+		//    }
+		//}
 
 		Treenode cppNode = null;
 		
-		private void NextCppNode_Click(object sender, RoutedEventArgs e) {
-			cppNode = dpt.FindNode(s => (s.Flags & Flags.CppFunc) == Flags.CppFunc);
-			//cppNode = Treenode.FindNodeWithFlags(left, cppNode, Flags.CPPFUNC);
+		//private void NextCppNode_Click(object sender, RoutedEventArgs e) {
+		//    cppNode = dpt.FindNode(s => (s.Flags & Flags.CppFunc) == Flags.CppFunc);
+		//    //cppNode = Treenode.FindNodeWithFlags(left, cppNode, Flags.CPPFUNC);
 			
-			if (cppNode != null) {
-				leftTree.SelectNode(cppNode);
-				leftText.Text = cppNode.DataAsString();
-			}
-		}
+		//    if (cppNode != null) {
+		//        leftTree.SelectNode(cppNode);
+		//    } 
+		//}
 
 		private void leftTreePath_MouseUp(object sender, MouseButtonEventArgs e) {
 			//((TreeViewItem)leftTree.tree.SelectedItem).BringIntoView();

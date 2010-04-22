@@ -4,7 +4,11 @@
 library
 C#
 .cs
+<<<<<<< HEAD
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\AvalonEdit\ICSharpCode.AvalonEdit\obj\Debug\
+=======
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\AvalonEdit\ICSharpCode.AvalonEdit\obj\Debug\
+>>>>>>> a6d2478acda86f2b321e1a890466e95d50c31000
 ICSharpCode.AvalonEdit
 none
 false
@@ -13,7 +17,11 @@ TRACE
 41928994542
 
 2031527084160
+<<<<<<< HEAD
 1591836353
+=======
+151303409832
+>>>>>>> a6d2478acda86f2b321e1a890466e95d50c31000
 CodeCompletion\CompletionList.xaml;CodeCompletion\InsightWindow.xaml;TextEditor.xaml;themes\generic.xaml;
 
 False

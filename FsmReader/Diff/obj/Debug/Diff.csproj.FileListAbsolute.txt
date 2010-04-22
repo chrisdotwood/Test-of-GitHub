@@ -1,0 +1,10 @@
+C:\Documents and Settings\chris\My Documents\Visual Studio 2008\Projects\Diff\Diff\bin\Debug\Diff.dll
+C:\Documents and Settings\chris\My Documents\Visual Studio 2008\Projects\Diff\Diff\bin\Debug\Diff.pdb
+C:\Documents and Settings\chris\My Documents\Visual Studio 2008\Projects\Diff\Diff\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\chris\My Documents\Visual Studio 2008\Projects\Diff\Diff\obj\Debug\Diff.dll
+C:\Documents and Settings\chris\My Documents\Visual Studio 2008\Projects\Diff\Diff\obj\Debug\Diff.pdb
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\bin\Debug\Diff.dll
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\bin\Debug\Diff.pdb
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\obj\Debug\Diff.dll
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Diff\obj\Debug\Diff.pdb

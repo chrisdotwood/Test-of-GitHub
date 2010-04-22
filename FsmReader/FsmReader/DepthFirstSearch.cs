@@ -14,13 +14,13 @@ namespace FsmReader {
 		private Func<Treenode, bool> predicate;
 		private Treenode result;
 		private Treenode lastResult;
+        Stack<int> stack = new Stack<int>();
 
 		public Treenode FindNode(Func<Treenode, bool> predicate) {
 			this.predicate = predicate;
 			result = null;
-			Stack<int> stack = new Stack<int>();
-
-			root.Accept(this, ref stack);
+			
+			root.Accept(this, stack);
 
 			Console.WriteLine(result.FullPath);
 

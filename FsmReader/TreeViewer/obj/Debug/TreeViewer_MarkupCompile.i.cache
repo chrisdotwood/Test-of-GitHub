@@ -4,17 +4,30 @@
 winexe
 C#
 .cs
+<<<<<<< HEAD
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\TreeViewer\obj\Debug\
+=======
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\TreeViewer\obj\Debug\
+>>>>>>> a6d2478acda86f2b321e1a890466e95d50c31000
 TreeViewer
 none
 false
 DEBUG;TRACE
+<<<<<<< HEAD
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\TreeViewer\App.xaml
 22132487954
 
 7-2083025900
 1469923452
 FsmTreeView.xaml;Window1.xaml;
+=======
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\TreeViewer\App.xaml
+5-1780345144
+
+10-584589778
+151293250945
+FsmTreeView.xaml;OpenTwoFilesDialog.xaml;TreeCodeBrowser.xaml;TreeDiffControl.xaml;Window1.xaml;
+>>>>>>> a6d2478acda86f2b321e1a890466e95d50c31000
 
 True
 

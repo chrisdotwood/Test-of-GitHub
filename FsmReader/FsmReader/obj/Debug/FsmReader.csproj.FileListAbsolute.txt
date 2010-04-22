@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\bin\Debug\FsmReader.dll
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\bin\Debug\FsmReader.pdb
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\obj\Debug\ResolveAssemblyReference.cache
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\obj\Debug\FsmReader.dll
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\obj\Debug\FsmReader.pdb
+=======
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\bin\Debug\FsmReader.dll
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\bin\Debug\FsmReader.pdb
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\obj\Debug\FsmReader.dll
+C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\obj\Debug\FsmReader.pdb
+>>>>>>> a6d2478acda86f2b321e1a890466e95d50c31000

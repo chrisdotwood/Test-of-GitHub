@@ -141,10 +141,16 @@ namespace FsmReader {
 
 			string[] parts = path.Split(new char[] { '/' });
 
+			if (parts.Length < 1 || parts[1] != relativeTo.Title) {
+				// The root node of the search differs
+				return null;
+			}
+
 			Treenode node = relativeTo;
 
-			for (int p = 0; p < parts.Length && node != null; p++) {
-				node = relativeTo[parts[p]];
+			// Start on 2 because of the leading forward slash giving an empty string and the starting nodes being the same
+			for (int p = 2; p < parts.Length && node != null; p++) {
+				node = node[parts[p]];
 			}
 			return node;
 		}
