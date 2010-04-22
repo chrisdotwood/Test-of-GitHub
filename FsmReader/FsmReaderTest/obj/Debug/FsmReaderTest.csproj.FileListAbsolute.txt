@@ -1,0 +1,8 @@
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReaderTest\bin\Debug\FsmReaderTest.exe
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReaderTest\bin\Debug\FsmReaderTest.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReaderTest\bin\Debug\FsmReader.dll
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReaderTest\bin\Debug\FsmReader.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReaderTest\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReaderTest\obj\Debug\FsmReaderTest.exe
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReaderTest\obj\Debug\FsmReaderTest.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReaderTest\bin\Debug\FsmReaderTest.exe.config
