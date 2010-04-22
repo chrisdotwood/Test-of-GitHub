@@ -1,5 +1,0 @@
-C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\bin\Debug\FsmReader.dll
-C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\bin\Debug\FsmReader.pdb
-C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\obj\Debug\ResolveAssemblyReference.cache
-C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\obj\Debug\FsmReader.dll
-C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader\obj\Debug\FsmReader.pdb
