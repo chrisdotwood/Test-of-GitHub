@@ -116,10 +116,20 @@ namespace TreeViewer {
 		
 		public TreenodeView(Treenode node, TreenodeView parent) {
 			this.Treenode = node;
+			this.Treenode.PropertyChanged += new PropertyChangedEventHandler(Treenode_PropertyChanged);
+
 			this.Parent = parent;
 
 			foreach (Treenode n in Treenode.NodeChildren.Cast<Treenode>()) {
 				children.Add(new TreenodeView(n, this));
+			}
+		}
+
+		void Treenode_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+			if (PropertyChanged != null) {
+				switch (e.PropertyName) {
+					case "DataType": PropertyChanged(this, new PropertyChangedEventArgs("IconPath")); break;
+				}
 			}
 		}
 

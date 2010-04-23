@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="TreeViewer.TreenodeFlagControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"
+			 xmlns:fsm="clr-namespace:FsmReader;assembly=FsmReader"
+			 xmlns:local="clr-namespace:TreeViewer"
+             d:DesignHeight="165" d:DesignWidth="120">
+	<UserControl.Resources>
+		<local:DataTypeToCheckedConverter x:Key="DataTypeConverter"/>
+	</UserControl.Resources>
+    <Grid>
+		<GroupBox Header="Data Type">
+			<StackPanel>
+				<RadioButton Margin="5" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=None, Converter={StaticResource DataTypeConverter}}">None</RadioButton>
+				<RadioButton Margin="5" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=Float, Converter={StaticResource DataTypeConverter}}">Float</RadioButton>
+				<RadioButton Margin="5" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=ByteBlock, Converter={StaticResource DataTypeConverter}}">String</RadioButton>
+				<RadioButton Margin="5" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=PointerCoupling, Converter={StaticResource DataTypeConverter}}">Coupling</RadioButton>
+				<RadioButton Margin="5" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=Object, Converter={StaticResource DataTypeConverter}}">Object</RadioButton>
+			</StackPanel>
+		</GroupBox>
+	</Grid>
+</UserControl>

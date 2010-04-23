@@ -6,13 +6,17 @@
 			 xmlns:local="clr-namespace:TreeViewer"
 			 xmlns:avalon="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
              mc:Ignorable="d" 
+			Loaded="UserControl_Loaded"
+			 x:Name="MainUserControl"
              d:DesignHeight="300" d:DesignWidth="300">
 	<UserControl.CommandBindings>
 		<CommandBinding Command="Open" CanExecute="OpenCommandBinding_CanExecute" Executed="OpenCommandBinding_Executed"/>
+		<CommandBinding Command="Save" CanExecute="SaveCommandBinding_CanExecute" Executed="SaveCommandBinding_Executed"/>
 	</UserControl.CommandBindings>
 	<DockPanel>
 		<ToolBar DockPanel.Dock="Top">
 			<Button Margin="3" Command="Open">Open</Button>
+			<Button Margin="3" Command="Save">Save</Button>
 		</ToolBar>
 		<Grid DockPanel.Dock="Bottom">
 			<Grid.RowDefinitions>
@@ -33,6 +37,7 @@
 			<GridSplitter HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="2" Grid.RowSpan="2"/>
 			<DockPanel Grid.Row="1" Grid.Column="1">
 				<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Name="RightTreePath" Background="LightGray"/>
+				<local:TreenodeFlagControl x:Name="RightFlags" DockPanel.Dock="Left"/>
 				<avalon:TextEditor DockPanel.Dock="Bottom" Grid.Row="1" Margin="5" Name="RightCodeText" FontFamily="Consolas"/>
 			</DockPanel>
 		</Grid>

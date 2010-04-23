@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace FsmReader {
 	#region Enums
@@ -17,6 +18,7 @@ namespace FsmReader {
 		Object = 4,
 		Particle = 5
 	}
+
 	[Flags]
 	public enum Flags {
 		Expanded = 0x01,
@@ -59,7 +61,7 @@ namespace FsmReader {
 
 	#endregion
 
-	public class Treenode : Composite {
+	public class Treenode : Composite, INotifyPropertyChanged {
 		byte Version { get; set; }
 		public Flags Flags { get; set; }
 		public string Title {
@@ -68,7 +70,25 @@ namespace FsmReader {
 		}
 		private object data;
 
-		public DataType DataType { get; set; }
+		private DataType dataType;
+		public DataType DataType {
+			get {
+				return dataType;
+			}
+			set {
+				if (value != dataType) {
+					dataType = value;
+					FirePropertyChanged("DataType");
+				}
+			}
+		}
+
+		private void FirePropertyChanged(string propertyName) {
+			if (PropertyChanged != null) {
+				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+
 		public uint Branch { get; set; }
 		public FlagsExtended ExtendedFlags { get; set; }
 		public uint IndexCache { get; set; }
@@ -137,7 +157,7 @@ namespace FsmReader {
 		/// <returns>The Treenode if it is found, null otherwise.</returns>
 		public static Treenode NodeFromPath(string path, Treenode relativeTo) {
 			if (path == null) throw new ArgumentException("path");
-			if(relativeTo == null) throw new ArgumentException("relativeTo");
+			if (relativeTo == null) throw new ArgumentException("relativeTo");
 
 			string[] parts = path.Split(new char[] { '/' });
 
@@ -250,5 +270,7 @@ namespace FsmReader {
 
 		#endregion
 
+
+		public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

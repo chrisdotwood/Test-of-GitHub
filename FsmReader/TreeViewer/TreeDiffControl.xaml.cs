@@ -22,8 +22,27 @@ namespace TreeViewer {
 	/// Interaction logic for TreeDiffControl.xaml
 	/// </summary>
 	public partial class TreeDiffControl : UserControl {
+		BackgroundWorker loadFileWorker = new BackgroundWorker();
+		BackgroundWorker loadFileWorker2 = new BackgroundWorker();
+
+		public static RoutedCommand MatchScrolling = new RoutedCommand();
+
+		private void MatchScrollingCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
+			e.CanExecute = e.Handled = true;
+		}
+	
+		private void MatchScrollingCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
+			Console.WriteLine();
+		}
+
 		public TreeDiffControl() {
 			InitializeComponent();
+
+			CommandBinding matchScrollingBinding = new CommandBinding(MatchScrolling, 
+				new ExecutedRoutedEventHandler(MatchScrollingCommandBinding_Executed), 
+				new CanExecuteRoutedEventHandler(MatchScrollingCommandBinding_CanExecute));
+
+			CommandManager.RegisterClassCommandBinding(typeof(TreeDiffControl), matchScrollingBinding);
 
 			LeftCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
 			RightCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
@@ -33,16 +52,18 @@ namespace TreeViewer {
 
 			loadFileWorker2.DoWork += new DoWorkEventHandler(loadFileWorker_DoWork);
 			loadFileWorker2.RunWorkerCompleted += new RunWorkerCompletedEventHandler(loadFileWorker_RunWorkerCompleted);
-
 		}
+
+		private void LeftCodeScrolled(object sender, ScrollChangedEventArgs args) {
+			RightCodeText.ScrollToVerticalOffset(args.VerticalOffset);
+		}
+
+		#region Load File Worker
 
 		private class LoadFileWorkerArgument {
 			public string Path;
 			public FsmTreeView Target;
 		}
-
-		BackgroundWorker loadFileWorker = new BackgroundWorker();
-		BackgroundWorker loadFileWorker2 = new BackgroundWorker();
 		
 		void loadFileWorker_DoWork(object sender, DoWorkEventArgs e) {
 			LoadFileWorkerArgument arg = (LoadFileWorkerArgument) e.Argument;
@@ -61,6 +82,8 @@ namespace TreeViewer {
 				return;
 			}
 		}
+
+		#endregion
 
 		private void LeftFsmTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
 			TreenodeView node = ((FsmTreeView)sender).SelectedItem;
@@ -84,10 +107,27 @@ namespace TreeViewer {
 		private void DiffCode() {
 			List<Change> changes = new Lcs().Diff(new DiffDocument(LeftCodeText.Text), new DiffDocument(RightCodeText.Text));
 
+				
+
 			foreach (Change c in changes) {
-				Console.WriteLine(c.ToString());
-				Console.WriteLine("----------------------------------------------------------------------------");
+				if (c.Type == ChangeType.Remove) {
+					int start = LeftCodeText.Document.GetLineByNumber(c.StartPosition1).Offset;
+					int end = LeftCodeText.Document.GetLineByNumber(c.EndPosition1).Offset;
+					LeftCodeText.Select(start, end - start);
+
+
+
+					Console.WriteLine(c.ToString());
+					Console.WriteLine("----------------------------------------------------------------------------");
+
+					break;
+				}
+				
 			}
+		}
+
+		private void UserControl_Loaded(object sender, RoutedEventArgs e) {
+			LeftCodeText.ScrollViewer.ScrollChanged += new ScrollChangedEventHandler(LeftCodeScrolled);
 		}
 
 		private void RightFsmTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
@@ -98,8 +138,11 @@ namespace TreeViewer {
 			} else {
 				RightCodeText.Text = node.Treenode.DataAsString();
 				RightTreePath.Text = node.Treenode.FullPath;
+				RightFlags.DataContext = node.Treenode;
 			}
 		}
+
+		#region Command Binding Event Handlers
 
 		private void OpenCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
 			e.CanExecute = e.Handled = true;
@@ -120,5 +163,17 @@ namespace TreeViewer {
 			}
 			e.Handled = true;
 		}
+
+	
+		private void SaveCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
+			e.Handled = e.CanExecute = true;
+		}
+
+		private void SaveCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
+
+		}
+
+		#endregion
+
 	}
 }

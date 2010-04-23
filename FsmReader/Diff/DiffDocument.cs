@@ -10,7 +10,7 @@ namespace Diff {
 		private DiffDocument() { }
 
 		public DiffDocument(string text) {
-			Lines = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+			Lines = text.Split(new string[] { "\n", Environment.NewLine }, StringSplitOptions.None);
 		}
 
 		public string this[int index] {

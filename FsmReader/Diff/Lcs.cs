@@ -5,16 +5,16 @@ using System.Text;
 
 namespace Diff {
 	public class Lcs {
-		private string[][] table = null;
+		private int[][] table = null;
 		private Change lastChange = null;
 
 		List<Change> changeList = new List<Change>();
 
 		public List<Change> Diff(DiffDocument d1, DiffDocument d2) {
-			table = new string[d1.Length][];
+			table = new int[d1.Length][];
 
 			for (int i = 0; i < d1.Length; i++) {
-				table[i] = new string[d2.Length];
+				table[i] = new int[d2.Length];
 			}
 
 			FindLcs(d1, d2);
@@ -33,7 +33,7 @@ namespace Diff {
 			if (i > 0 && j > 0 && r[i] == c[j]) {
 				Diff(r, c, i - 1, j - 1);
 			} else {
-				if (j > 0 && (i == 0 || table[i][j - 1].Length >= table[i - 1][j].Length)) {
+				if (j > 0 && (i == 0 || table[i][j - 1] >= table[i - 1][j])) {
 					Diff(r, c, i, j - 1);
 
 					if (lastChange == null || lastChange.Type != ChangeType.Add) {
@@ -42,11 +42,9 @@ namespace Diff {
 						}
 
 						lastChange = new Change() { Type = ChangeType.Add, StartPosition1 = i, StartPosition2 = j };
-					} else {
-						
-					}
+					} 
 					lastChange.TextAdded += c[j] + Environment.NewLine;
-				} else if (i > 0 && (j == 0 || table[i][j - 1].Length < table[i - 1][j].Length)) {
+				} else if (i > 0 && (j == 0 || table[i][j - 1] < table[i - 1][j])) {
 					Diff(r, c, i - 1, j);
 
 					if (lastChange == null || lastChange.Type != ChangeType.Remove) {
@@ -71,39 +69,25 @@ namespace Diff {
 		/// <param name="d1">The original document.</param>
 		/// <param name="d2">The new document.</param>
 		/// <returns>A string containing the longest common subsequence of identical lines across two documents</returns>
-		private string FindLcs(DiffDocument d1, DiffDocument d2) {
-			if (d2.Length == 0 || d1.Length == 0) return string.Empty;
+		private int FindLcs(DiffDocument d1, DiffDocument d2) {
+			if (d2.Length == 0 || d1.Length == 0) return 0;
 
-			if (table[d1.Length - 1][d2.Length - 1] != null) {
-				return table[d1.Length - 1][d2.Length - 1];
-			}
+			//if (table[d1.Length - 1][d2.Length - 1] != 0) {
+			//    return table[d1.Length - 1][d2.Length - 1];
+			//}
 
-			string lcs;
+			int lcs;
 			if (d1[d1.Length - 1] == (d2[d2.Length - 1])) {
 				// Suppose that two sequences both end in the same element. To find their LCS, shorten each sequence by removing the last element, 
 				// find the LCS of the shortened sequences, and to that LCS append the removed element.
-				lcs = FindLcs(d1.Substring(0, d1.Length - 1), d2.Substring(0, d2.Length - 1)) + d1[d1.Length - 1];
+				lcs = FindLcs(d1.Substring(0, d1.Length - 1), d2.Substring(0, d2.Length - 1)) + 1;
 			} else {
 				// Suppose that the two sequences X and Y do not end in the same symbol. Then the LCS of X and Y is the longest sequence of LCS(Xn,Ym-1) and LCS(Xn-1,Ym).
-				lcs = Longest(FindLcs(d1, d2.Substring(0, d2.Length - 1)), FindLcs(d1.Substring(0, d1.Length - 1), d2));
+				lcs = Math.Max(FindLcs(d1, d2.Substring(0, d2.Length - 1)), FindLcs(d1.Substring(0, d1.Length - 1), d2));
 			}
 
 			table[d1.Length - 1][d2.Length - 1] = lcs;
 			return lcs;
 		}
-
-		#region Static Utility Methods
-
-		/// <summary>
-		/// Returns the longest of the two string s1 and s2.
-		/// </summary>
-		/// <param name="s1"></param>
-		/// <param name="s2"></param>
-		/// <returns></returns>
-		private static string Longest(string s1, string s2) {
-			return s1.Length > s2.Length ? s1 : s2;
-		}
-
-		#endregion
 	}
 }

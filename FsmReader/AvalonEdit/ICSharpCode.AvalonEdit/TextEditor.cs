@@ -269,7 +269,7 @@ namespace ICSharpCode.AvalonEdit
 		/// Gets the scroll viewer used by the text editor.
 		/// This property can return null if the template has not been applied / does not contain a scroll viewer.
 		/// </summary>
-		internal ScrollViewer ScrollViewer {
+		public ScrollViewer ScrollViewer {
 			get { return scrollViewer; }
 		}
 		
