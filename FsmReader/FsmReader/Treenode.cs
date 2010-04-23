@@ -27,8 +27,8 @@ namespace FsmReader {
 		Selected = 0x08,
 		HideConnectors = 0x10,
 		HideLabel = 0x20,
-		ExtendedFlags = 0x40,
-		ExtendedFlagsA = 0x80
+		FlagsExtended = 0x40,
+		FlagsExtendedA = 0x80
 	}
 
 	[Flags]
@@ -62,11 +62,43 @@ namespace FsmReader {
 	#endregion
 
 	public class Treenode : Composite, INotifyPropertyChanged {
-		byte Version { get; set; }
-		public Flags Flags { get; set; }
-		public string Title {
+		public Treenode() {
+			NodeChildren = new Collection<Treenode>();
+			DataChildren = new Collection<Treenode>();
+		}
+
+		#region Properties
+
+		public byte Version {
 			get;
 			set;
+		}
+
+		private Flags flags = Flags.FlagsExtended;
+		public Flags Flags {
+			get {
+				return flags;
+			}
+			set {
+				if (value != flags) {
+					flags = value;
+					FirePropertyChanged("Flags");
+				}
+			}
+		}
+		private bool isData = false;
+
+		private string title = "";
+		public string Title {
+			get {
+				return title;
+			}
+			set {
+				if (value != title) {
+					title = value;
+					FirePropertyChanged("Title");
+				}
+			}
 		}
 		private object data;
 
@@ -90,8 +122,19 @@ namespace FsmReader {
 		}
 
 		public uint Branch { get; set; }
-		public FlagsExtended ExtendedFlags { get; set; }
-		public uint IndexCache { get; set; }
+
+		public FlagsExtended FlagsExtended { get; set; }
+
+		private uint indexCache;
+		public uint IndexCache {
+			get {
+				return indexCache;
+			}
+			set {
+				indexCache = value;
+			}
+		}
+
 		public uint CppType { get; set; }
 
 		public uint Size { get; set; }
@@ -102,26 +145,22 @@ namespace FsmReader {
 			private set;
 		}
 
-		public Treenode() {
-			NodeChildren = new Collection<Treenode>();
+		public Collection<Treenode> DataChildren {
+			get;
+			private set;
 		}
 
 		public override ReadOnlyCollection<Composite> Children {
 			get {
-				IList<Composite> c = NodeChildren.ToList<Composite>();
+				List<Composite> c = NodeChildren.ToList<Composite>();
+				c.AddRange(DataChildren);
+
+				//TODO This needs to be implemented in a more performant manner
 				return new ReadOnlyCollection<Composite>(c);
 			}
 		}
 
 		public Treenode Parent { get; set; }
-
-		public string DataAsString() {
-			if (data != null) {
-				return data.ToString();
-			} else {
-				return "";
-			}
-		}
 
 		public string FullPath {
 			get {
@@ -133,6 +172,17 @@ namespace FsmReader {
 					up = up.Parent;
 				}
 				return path;
+			}
+		}
+
+
+		#endregion
+
+		public string DataAsString() {
+			if (data != null) {
+				return data.ToString();
+			} else {
+				return "";
 			}
 		}
 
@@ -175,12 +225,20 @@ namespace FsmReader {
 			return node;
 		}
 
-		#region Read
+		public int NodeNumber { get; set; }
+
+		#region Serialisation
 
 		public static Treenode Read(Stream stream) {
+			int count = -1;
+			return _Read(stream, ref count);
+		}
+
+		private static Treenode _Read(Stream stream, ref int count) {
 			BinaryReader reader = new BinaryReader(stream);
 
 			Treenode ret = new Treenode();
+			ret.NodeNumber = count++;
 
 			ret.Version = reader.ReadByte();
 			ret.Flags = (Flags)Enum.ToObject(typeof(DataType), reader.ReadByte());
@@ -194,15 +252,15 @@ namespace FsmReader {
 
 			ret.Branch = reader.ReadUInt32();
 
-			if ((ret.Flags & Flags.ExtendedFlags) == Flags.ExtendedFlags) {
-				ret.ExtendedFlags = (FlagsExtended)Enum.ToObject(typeof(FlagsExtended), reader.ReadUInt32());
+			if ((ret.Flags & Flags.FlagsExtended) == Flags.FlagsExtended) {
+				ret.FlagsExtended = (FlagsExtended)Enum.ToObject(typeof(FlagsExtended), reader.ReadUInt32());
 			}
 
-			if ((ret.ExtendedFlags & FlagsExtended.ODTDerivative) == FlagsExtended.ODTDerivative) {
+			if ((ret.FlagsExtended & FlagsExtended.ODTDerivative) == FlagsExtended.ODTDerivative) {
 				ret.CppType = reader.ReadUInt32();
 			}
 
-			if ((ret.ExtendedFlags & FlagsExtended.IndexCache) == FlagsExtended.IndexCache) {
+			if ((ret.FlagsExtended & FlagsExtended.IndexCache) == FlagsExtended.IndexCache) {
 				ret.IndexCache = reader.ReadUInt32();
 			}
 
@@ -214,28 +272,24 @@ namespace FsmReader {
 
 					ret.data = Encoding.UTF8.GetString(buf).Replace("\0", "");
 				}
-			}
-
-			if (ret.DataType == DataType.Float) {
+			} else if (ret.DataType == DataType.Float) {
 				ret.data = reader.ReadDouble();
-			}
-
-			if (ret.DataType == DataType.PointerCoupling) {
+			} else if (ret.DataType == DataType.PointerCoupling) {
 				ret.data = reader.ReadUInt32();
 			}
 
 			if (ret.Branch > 0) {
-				Treenode dataChild = Read(stream);
+				Treenode dataChild = _Read(stream, ref count);
 
 				uint dataNodesToRead = dataChild.Size;
 
 				while (dataNodesToRead-- > 0) {
-					Treenode node = Read(stream);
+					Treenode node = _Read(stream, ref count);
 					node.Parent = ret;
 
 					if (ret.DataType == DataType.Object) {
-						//ret.dataChildren.Add(node);
-						ret.NodeChildren.Add(node);
+						node.isData = true;
+						ret.DataChildren.Add(node);
 					} else {
 						ret.NodeChildren.Add(node);
 					}
@@ -243,19 +297,19 @@ namespace FsmReader {
 			}
 
 			if (ret.DataType == DataType.Object) {
-				Treenode dataChild = Read(stream);
+				Treenode dataChild = _Read(stream, ref count);
 
 				uint nodesToRead = dataChild.Size;
 
 				while (nodesToRead-- > 0) {
-					Treenode node = Read(stream);
+					Treenode node = _Read(stream, ref count);
 					node.Parent = ret;
 
 					if (ret.Branch > 0) {
-						//ret.dataChildren.Add(node);
 						ret.NodeChildren.Add(node);
 					} else {
-						ret.NodeChildren.Add(node);
+						node.isData = true;
+						ret.DataChildren.Add(node);
 					}
 				}
 			} else if (ret.DataType == DataType.Particle) {
@@ -268,9 +322,82 @@ namespace FsmReader {
 			return ret;
 		}
 
+		public static void Write(Treenode root, Stream file) {
+			BinaryWriter writer = new BinaryWriter(file);
+
+			writer.Write(root.Version);
+			writer.Write((byte)root.Flags);
+
+			writer.Write(root.Title.Length + 1);
+			writer.Write(Encoding.ASCII.GetBytes(root.Title+ '\0'));
+
+			writer.Write((uint)root.DataType);
+
+			writer.Write(root.Branch);
+
+			if ((root.Flags & Flags.FlagsExtended) == Flags.FlagsExtended) {
+				writer.Write((uint)root.FlagsExtended);
+			}
+
+			if ((root.FlagsExtended & FlagsExtended.ODTDerivative) == FlagsExtended.ODTDerivative) {
+				writer.Write((uint)root.CppType);
+			}
+
+			if ((root.FlagsExtended & FlagsExtended.IndexCache) == FlagsExtended.IndexCache) {
+				writer.Write((uint)root.IndexCache);
+			}
+
+			if (root.DataType == DataType.ByteBlock) {
+				string str = (string)root.data;
+
+				writer.Write(str.Length+ 1);
+				writer.Write(Encoding.ASCII.GetBytes(str + '\0'));
+			} else if (root.DataType == DataType.Float) {
+				writer.Write((double)root.data);
+			} else if (root.DataType == DataType.PointerCoupling) {
+				writer.Write((uint)root.data);
+			}
+
+			if (root.Branch > 0) {
+				Collection<Treenode> children = root.DataType == DataType.Object ? root.DataChildren : root.NodeChildren;
+				
+				Treenode dummy = new Treenode() {
+					Size = (uint)children.Count,
+					Title = "\0",
+					Version = 2,
+					DataType = DataType.Float,
+					data = (double)0
+				};
+				Write(dummy, file);
+
+				foreach (Treenode child in children) {
+					Treenode.Write(child, file);
+				}
+			}
+
+			if (root.DataType == DataType.Object) {
+				Collection<Treenode> children = root.Branch == 0 ? root.DataChildren : root.NodeChildren;
+
+				Treenode dummy = new Treenode() {
+					Size = (uint)children.Count,
+					Title = "\0",
+					Version = 2
+				};
+				Write(dummy, file);
+
+				foreach (Treenode child in children) {
+					Treenode.Write(child, file);
+				}
+			}
+
+			if ((root.Flags & Flags.HasOwner) != Flags.HasOwner) {
+				writer.Write(root.Size);
+			}
+		}
+
 		#endregion
 
-
 		public event PropertyChangedEventHandler PropertyChanged;
+
 	}
 }
