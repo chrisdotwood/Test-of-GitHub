@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace FsmReader {
 	#region Enums
@@ -35,7 +36,7 @@ namespace FsmReader {
 	public enum FlagsExtended {
 		ShowObject = 0x00000001,
 		Selected = 0x00000002,
-		FlexScript = 0x00000004,
+		Flexscript = 0x00000004,
 		Null = 0x00000008,
 
 		FunctionDisabled = 0x00000010,
@@ -67,10 +68,8 @@ namespace FsmReader {
 			DataChildren = new Collection<Treenode>();
 		}
 
-		private Treenode dummy;
-		private Treenode dataDummy;
-
-
+		private Treenode childSizeNode;
+		private Treenode dataSizeNode;
 
 		#region Properties
 
@@ -78,20 +77,6 @@ namespace FsmReader {
 			get;
 			set;
 		}
-
-		private Flags flags = Flags.FlagsExtended;
-		public Flags Flags {
-			get {
-				return flags;
-			}
-			set {
-				if (value != flags) {
-					flags = value;
-					FirePropertyChanged("Flags");
-				}
-			}
-		}
-		private bool isData = false;
 
 		private string title = "";
 		public string Title {
@@ -120,15 +105,33 @@ namespace FsmReader {
 			}
 		}
 
-		private void FirePropertyChanged(string propertyName) {
-			if (PropertyChanged != null) {
-				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+		private Flags flags = Flags.FlagsExtended;
+		public Flags Flags {
+			get {
+				return flags;
+			}
+			set {
+				if (value != flags) {
+					flags = value;
+					FirePropertyChanged("Flags");
+				}
+			}
+		}
+
+		private FlagsExtended flagsExtended;
+		public FlagsExtended FlagsExtended {
+			get {
+				return flagsExtended;
+			}
+			set {
+				if (value != flagsExtended) {
+					flagsExtended = value;
+					FirePropertyChanged("FlagsExtended");
+				}
 			}
 		}
 
 		public uint Branch { get; set; }
-
-		public FlagsExtended FlagsExtended { get; set; }
 
 		private uint indexCache;
 		public uint IndexCache {
@@ -140,9 +143,15 @@ namespace FsmReader {
 			}
 		}
 
-		public uint CppType { get; set; }
+		public uint CppType { 
+			get;
+			set; 
+		}
 
-		public uint Size { get; set; }
+		public uint Size {
+			get;
+			set; 
+		}
 
 		//public List<Treenode> dataChildren = new List<Treenode>();
 		public Collection<Treenode> NodeChildren {
@@ -165,7 +174,10 @@ namespace FsmReader {
 			}
 		}
 
-		public Treenode Parent { get; set; }
+		public Treenode Parent { 
+			get; 
+			set; 
+		}
 
 		public string FullPath {
 			get {
@@ -180,14 +192,61 @@ namespace FsmReader {
 			}
 		}
 
+		public int NodeNumber { 
+			get; 
+			set; 
+		}
+
+		public object Data {
+			get {
+				return data;
+			}
+			set {
+				data = value;
+			}
+		}
+
+		public string DataAsString {
+			get {
+				Debug.Assert(DataType == FsmReader.DataType.ByteBlock);
+
+				if (data != null) {
+					return data.ToString();
+				} else {
+					return "";
+				}
+			}
+			set {
+				Debug.Assert(DataType == FsmReader.DataType.ByteBlock);
+
+				if ((string)data != value) {
+					data = value;
+					FirePropertyChanged("DataAsString");
+				}
+			}
+		}
+
+		public double DataAsDouble {
+			get {
+				Debug.Assert(DataType == FsmReader.DataType.Float);
+
+				return (double)data;
+			}
+			set {
+				Debug.Assert(DataType == FsmReader.DataType.Float);
+
+				if ((double)data != value) {
+					data = value;
+					FirePropertyChanged("DataAsDouble");
+				}
+			}
+		}
 
 		#endregion
 
-		public string DataAsString() {
-			if (data != null) {
-				return data.ToString();
-			} else {
-				return "";
+		private void FirePropertyChanged(string propertyName) {
+			if (PropertyChanged != null) {
+				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
 
@@ -200,7 +259,12 @@ namespace FsmReader {
 
 		public Treenode this[string childName] {
 			get {
-				return NodeChildren.FirstOrDefault(s => s.Title == childName);
+				Treenode ret = NodeChildren.FirstOrDefault(s => s.Title == childName);
+				if (ret != null) {
+					return ret;
+				} else {
+					return DataChildren.FirstOrDefault(s => s.Title == childName);
+				}
 			}
 		}
 
@@ -229,8 +293,6 @@ namespace FsmReader {
 			}
 			return node;
 		}
-
-		public int NodeNumber { get; set; }
 
 		#region Serialisation
 
@@ -284,16 +346,15 @@ namespace FsmReader {
 			}
 
 			if (ret.Branch > 0) {
-				ret.dummy =  _Read(stream, ref count);
+				ret.childSizeNode = _Read(stream, ref count);
 
-				uint dataNodesToRead = ret.dummy.Size;
-				
+				uint dataNodesToRead = ret.childSizeNode.Size;
+
 				while (dataNodesToRead-- > 0) {
 					Treenode node = _Read(stream, ref count);
 					node.Parent = ret;
 
 					if (ret.DataType == DataType.Object) {
-						node.isData = true;
 						ret.DataChildren.Add(node);
 					} else {
 						ret.NodeChildren.Add(node);
@@ -302,9 +363,9 @@ namespace FsmReader {
 			}
 
 			if (ret.DataType == DataType.Object) {
-				ret.dataDummy = _Read(stream, ref count);
+				ret.dataSizeNode = _Read(stream, ref count);
 
-				uint nodesToRead = ret.dataDummy.Size;
+				uint nodesToRead = ret.dataSizeNode.Size;
 
 				while (nodesToRead-- > 0) {
 					Treenode node = _Read(stream, ref count);
@@ -313,7 +374,6 @@ namespace FsmReader {
 					if (ret.Branch > 0) {
 						ret.NodeChildren.Add(node);
 					} else {
-						node.isData = true;
 						ret.DataChildren.Add(node);
 					}
 				}
@@ -366,8 +426,8 @@ namespace FsmReader {
 			if (root.Branch > 0) {
 				Collection<Treenode> children = root.DataType == DataType.Object ? root.DataChildren : root.NodeChildren;
 
-				root.dummy.Size = (uint)children.Count;
-				Write(root.dummy, file);
+				root.childSizeNode.Size = (uint)children.Count;
+				Write(root.childSizeNode, file);
 
 				foreach (Treenode child in children) {
 					Treenode.Write(child, file);
@@ -383,8 +443,8 @@ namespace FsmReader {
 					children = root.NodeChildren;
 				}
 
-				root.dataDummy.Size = (uint)children.Count;
-				Write(root.dataDummy, file);
+				root.dataSizeNode.Size = (uint)children.Count;
+				Write(root.dataSizeNode, file);
 
 				foreach (Treenode child in children) {
 					Treenode.Write(child, file);

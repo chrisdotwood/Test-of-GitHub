@@ -15,12 +15,12 @@
         <Grid.CommandBindings>
             <CommandBinding Command="SaveAs" CanExecute="SaveAsCommandBinding_CanExecute" Executed="SaveAsCommandBinding_Executed" />
         </Grid.CommandBindings>
-		<TreeView Name="tree" SelectedItemChanged="tree_SelectedItemChanged">
+		<TreeView Name="Tree" SelectedItemChanged="tree_SelectedItemChanged">
             <TreeView.Resources>
                 <local:BooleanToVisibilityConverter x:Key="visibilityConverter"/>
                 <HierarchicalDataTemplate DataType="{x:Type local:TreenodeView}" ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal" ContextMenu="{StaticResource ContextMenu}">
-                        <Image Source="{Binding IconPath}" Margin="3,0"/>
+                        <Image Source="{Binding IconPath, NotifyOnSourceUpdated=True}" Margin="3,0"/>
                         <TextBlock Text="{Binding Path=Title}" Margin="3,0"/>
                         <!--TextBlock Text="{Binding Path=DataAsString}" Visibility="{Binding Path=IsSelected, Converter={StaticResource visibilityConverter}}"/-->
                     </StackPanel>

@@ -57,7 +57,7 @@ namespace TreeViewer {
 		}
 
 		public void SelectNode(Treenode target) {
-			if (tree.Items.Count == 0) return;
+			if (Tree.Items.Count == 0) return;
 
 			Stack<Treenode> ancestors = new Stack<Treenode>();
 
@@ -74,7 +74,7 @@ namespace TreeViewer {
 
 				ObservableCollection<TreenodeView> items;
 				if (item == null) {
-					items = new ObservableCollection<TreenodeView>() { (TreenodeView)tree.Items[0] };
+					items = new ObservableCollection<TreenodeView>() { (TreenodeView)Tree.Items[0] };
 				} else {
 					items = item.Children;
 				}
@@ -82,8 +82,8 @@ namespace TreeViewer {
 				foreach (TreenodeView n in items) {
 					if (n.Treenode == node) {
 						item = n;
-						if (item.Parent != null) {
-							item.Parent.IsExpanded = true;
+						if (item.TreenodeViewParent != null) {
+							item.TreenodeViewParent.IsExpanded = true;
 						}
 						break;
 					}
@@ -97,14 +97,14 @@ namespace TreeViewer {
 		}
 
 		private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
-			tree.ItemsSource = new ObservableCollection<TreenodeView> { new TreenodeView((Treenode)e.NewValue, null) };
+			Tree.ItemsSource = new ObservableCollection<TreenodeView> { new TreenodeView((Treenode)e.NewValue, null) };
 		}
 
 		private void tree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {
-			if (tree.SelectedItem == null) {
+			if (Tree.SelectedItem == null) {
 				SelectedItem = null;
 			} else {
-				SelectedItem = tree.SelectedItem as TreenodeView;
+				SelectedItem = Tree.SelectedItem as TreenodeView;
 			}
 		}
 
@@ -138,126 +138,6 @@ namespace TreeViewer {
 		#endregion
 	}
 
-	public class TreenodeView : INotifyPropertyChanged {
-		public TreenodeView(Treenode node, TreenodeView parent) {
-			this.Treenode = node;
-
-			// TODO Ensure that TreenodeViews are destroyed when the Treenodes are in existance but the containing TreeView isn't
-			this.Treenode.PropertyChanged += new PropertyChangedEventHandler(Treenode_PropertyChanged);
-
-			this.Parent = parent;
-
-			foreach (Treenode n in Treenode.Children.Cast<Treenode>()) {
-				children.Add(new TreenodeView(n, this));
-			}
-		}
-
-		~TreenodeView() {
-			if (this.Treenode != null) {
-				this.Treenode.PropertyChanged -= Treenode_PropertyChanged;
-			}
-		}
-
-		private ObservableCollection<TreenodeView> children = new ObservableCollection<TreenodeView>();
-
-		public Treenode Treenode { get; set; }
-
-		public TreenodeView Parent { get; set; }
-
-
-
-		void Treenode_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-			if (PropertyChanged != null) {
-				switch (e.PropertyName) {
-					case "DataType": PropertyChanged(this, new PropertyChangedEventArgs("IconPath")); break;
-				}
-			}
-		}
-
-		public ObservableCollection<TreenodeView> Children {
-			get {
-				return children;
-			}
-		}
-
-		public string Title {
-			get {
-				if (Treenode.DataType == DataType.PointerCoupling) return Treenode.Title + " " + Treenode.NodeNumber;
-				return Treenode.Title;
-			}
-		}
-
-		public string DataAsString {
-			get {
-				string str = Treenode.DataAsString();
-				int eol = str.IndexOf('\n');
-
-				if (eol < 0) {
-					return str;
-				} else {
-					return str.Substring(0, eol);
-				}
-			}
-		}
-
-		private bool isSelected = false;
-		public bool IsSelected {
-			get {
-				return isSelected;
-			}
-			set {
-				if (value != isSelected) {
-					isSelected = value;
-					if (PropertyChanged != null) {
-						PropertyChanged(this, new PropertyChangedEventArgs("IsSelected"));
-					}
-				}
-			}
-		}
-
-		private bool isExpanded = false;
-		public bool IsExpanded {
-			get {
-				return isExpanded;
-			}
-			set {
-				if (value != isExpanded) {
-					isExpanded = value;
-					if (PropertyChanged != null) {
-						PropertyChanged(this, new PropertyChangedEventArgs("IsExpanded"));
-					}
-				}
-			}
-		}
-
-		public string IconPath {
-			get {
-				if (Treenode.DataType == DataType.Object) {
-					return "Images/Object.png";
-				} else if ((Treenode.Flags & Flags.CppFunc) == Flags.CppFunc) {
-					return "Images/CPP.png";
-				} else if ((Treenode.FlagsExtended & FlagsExtended.DLLFunc) == FlagsExtended.DLLFunc) {
-					return "Images/DLL.png";
-				} else if ((Treenode.FlagsExtended & FlagsExtended.GlobalCPPFunc) == FlagsExtended.GlobalCPPFunc) {
-					return "Images/GlobalCPP.png";
-				} else if ((Treenode.FlagsExtended & FlagsExtended.FlexScript) == FlagsExtended.FlexScript) {
-					return "Images/Flexscript.png";
-				} else {
-					if (Treenode.NodeChildren.Count > 0) {
-						return "Images/Folder.png";
-					} else {
-						return "Images/Default.png";
-					}
-				}
-			}
-		}
-
-		#region INotifyPropertyChanged Members
-
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		#endregion
-	}
 
 	public class BooleanToVisibilityConverter : IValueConverter {
 		#region IValueConverter Members

@@ -52,7 +52,7 @@ namespace TreeViewer {
 				TreePath.Text = "No Node Selected";
 
 			} else {
-				CodeText.Text = node.Treenode.DataAsString();
+				CodeText.Text = node.Treenode.DataAsString;
 				TreePath.Text = node.Treenode.FullPath;
 
 				//select lines 3 to 5
