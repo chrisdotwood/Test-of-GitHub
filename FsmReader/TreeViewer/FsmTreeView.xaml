@@ -7,8 +7,26 @@
 	DataContextChanged="UserControl_DataContextChanged" 
 	d:DesignHeight="284" d:DesignWidth="463">
     <Grid>
-		<TreeView Name="tree" ItemsSource="{Binding}" SelectedItemChanged="tree_SelectedItemChanged">
-			<TreeView.ItemContainerStyle>
+        <Grid.Resources>
+            <ContextMenu x:Key="ContextMenu">
+                <MenuItem Header="Save Node" Command="SaveAs" />
+            </ContextMenu>
+        </Grid.Resources>
+        <Grid.CommandBindings>
+            <CommandBinding Command="SaveAs" CanExecute="SaveAsCommandBinding_CanExecute" Executed="SaveAsCommandBinding_Executed" />
+        </Grid.CommandBindings>
+		<TreeView Name="tree" SelectedItemChanged="tree_SelectedItemChanged">
+            <TreeView.Resources>
+                <local:BooleanToVisibilityConverter x:Key="visibilityConverter"/>
+                <HierarchicalDataTemplate DataType="{x:Type local:TreenodeView}" ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal" ContextMenu="{StaticResource ContextMenu}">
+                        <Image Source="{Binding IconPath}" Margin="3,0"/>
+                        <TextBlock Text="{Binding Path=Title}" Margin="3,0"/>
+                        <!--TextBlock Text="{Binding Path=DataAsString}" Visibility="{Binding Path=IsSelected, Converter={StaticResource visibilityConverter}}"/-->
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+            <TreeView.ItemContainerStyle>
 				<Style TargetType="{x:Type TreeViewItem}">
 					<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
 					<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
@@ -20,17 +38,6 @@
 					</Style.Triggers>
 				</Style>
 			</TreeView.ItemContainerStyle>
-
-			<TreeView.Resources>
-				<local:BooleanToVisibilityConverter x:Key="visibilityConverter"/>
-				<HierarchicalDataTemplate DataType="{x:Type local:TreenodeView}" ItemsSource="{Binding Children}">
-					<StackPanel Orientation="Horizontal">
-						<Image Source="{Binding IconPath}" Margin="3,0"/>
-						<TextBlock Text="{Binding Path=Title}" Margin="3,0"/>
-						<!--TextBlock Text="{Binding Path=DataAsString}" Visibility="{Binding Path=IsSelected, Converter={StaticResource visibilityConverter}}"/-->
-					</StackPanel>
-				</HierarchicalDataTemplate>
-			</TreeView.Resources>
 		</TreeView>
 	</Grid>
 </UserControl>

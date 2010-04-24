@@ -16,6 +16,7 @@ using System.IO;
 using FsmReader;
 using ICSharpCode.AvalonEdit.Highlighting;
 using Diff;
+using Microsoft.Win32;
 
 namespace TreeViewer {
 	/// <summary>
@@ -34,6 +35,7 @@ namespace TreeViewer {
 		private void MatchScrollingCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
 			Console.WriteLine();
 		}
+
 
 		public TreeDiffControl() {
 			InitializeComponent();
@@ -170,7 +172,14 @@ namespace TreeViewer {
 		}
 
 		private void SaveCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
-
+			SaveFileDialog sfd = new SaveFileDialog();
+			bool? result = sfd.ShowDialog();
+			if (result.HasValue && result.Value) {
+				// Add root node DP
+				using (FileStream fs = new FileStream(sfd.FileName, FileMode.Create)) {
+					Treenode.Write((Treenode)LeftFsmTree.DataContext, fs);
+				}
+			}
 		}
 
 		#endregion

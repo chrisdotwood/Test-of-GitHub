@@ -3,11 +3,36 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="clr-namespace:TreeViewer"
 	xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+    xmlns:r="clr-namespace:Microsoft.Windows.Controls.Ribbon;assembly=RibbonControlsLibrary"
     Title="Window1" Height="548" Width="612" Loaded="Window_Loaded">
-	<Grid>
-		<local:TreeDiffControl/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <r:Ribbon>
+            <r:Ribbon.Resources>
+                <r:RibbonCommand x:Key="SaveCommand"
+                           CanExecute="SaveCommand_CanExecute"
+                           Executed="SaveCommand_Executed"
+                           LabelTitle="Save"
+                           SmallImageSource="Images\RibbonIcons\Search.png"
+                           LargeImageSource="Images\RibbonIcons\Search.png"
+                           ToolTipTitle="Save"
+                           ToolTipDescription="Save your work." />
+                <r:RibbonCommand x:Key="AnotherCommand"/>
+            </r:Ribbon.Resources>
 
-		<!--Grid.RowDefinitions>
+            <r:RibbonTab Label="Search">
+                <r:RibbonGroup>
+                    <r:RibbonTextBox Margin="3" x:Name="SearchText" Command="{StaticResource SaveCommand}"/>
+                   
+                </r:RibbonGroup>
+            </r:RibbonTab>
+        </r:Ribbon>
+        <local:TreeDiffControl Grid.Row="1"/>
+
+        <!--Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
@@ -17,6 +42,6 @@
 		<GridSplitter Width="3" Grid.RowSpan="2" Margin="3"/>
 		<local:TreeCodeBrowser x:Name="LeftBrowser" Grid.Column="0"/>
 		<local:TreeCodeBrowser x:Name="RightBrowser" Grid.Column="1"/-->
-	</Grid>
+    </Grid>
 
 </Window>

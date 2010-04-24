@@ -40,7 +40,7 @@ namespace TreeViewer {
 			InitializeComponent();
 
 			ofd.Filter = "Flexsim Models (*.fsm)|*.fsm|Tree Files (*.t)|*.t|All Files (*.*)|*.*";
-			ofd.Multiselect = false;
+			ofd.Multiselect = true;
 			ofd.Title = "Select file...";
 		}
 
@@ -48,6 +48,9 @@ namespace TreeViewer {
 			Nullable<bool> result = ofd.ShowDialog();
 			if (result.HasValue && result.Value == true) {
 				LeftPath = ofd.FileName;
+				if (ofd.FileNames.Length > 1) {
+					RightPath = ofd.FileNames[1];
+				}
 			}
 		}
 

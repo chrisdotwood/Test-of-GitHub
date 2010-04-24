@@ -15,6 +15,8 @@ using FsmReader;
 using System.Reflection;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using Microsoft.Win32;
+using System.IO;
 
 namespace TreeViewer {
 	/// <summary>
@@ -93,7 +95,7 @@ namespace TreeViewer {
 			item.IsSelected = true;
 			SelectedItem = item;
 		}
-		
+
 		private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
 			tree.ItemsSource = new ObservableCollection<TreenodeView> { new TreenodeView((Treenode)e.NewValue, null) };
 		}
@@ -102,28 +104,67 @@ namespace TreeViewer {
 			if (tree.SelectedItem == null) {
 				SelectedItem = null;
 			} else {
-				SelectedItem = (TreenodeView)tree.SelectedItem;
+				SelectedItem = tree.SelectedItem as TreenodeView;
 			}
 		}
+
+		#region Command Bindings
+
+		private void SaveAsCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
+			e.Handled = true;
+			e.CanExecute = SelectedItem != null;
+		}
+
+		private void SaveAsCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
+			if (SelectedItem == null) {
+				e.Handled = true;
+				return;
+			}
+			SaveFileDialog sfd = new SaveFileDialog();
+			sfd.Filter = "Tree (*.t)|*.t|Flexsim Model (*.fsm)|*fsm|All Files (*.*)|*.*";
+			bool? result = sfd.ShowDialog();
+			if (result.HasValue && result.Value) {
+				try {
+					using (FileStream fs = new FileStream(sfd.FileName, FileMode.Create)) {
+						Treenode.Write(SelectedItem.Treenode, fs);
+					}
+				} catch (Exception ex) {
+					MessageBox.Show("An error occurred whilst saving the file:" + Environment.NewLine + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				}
+			}
+			e.Handled = true;
+		}
+
+		#endregion
 	}
 
 	public class TreenodeView : INotifyPropertyChanged {
+		public TreenodeView(Treenode node, TreenodeView parent) {
+			this.Treenode = node;
+
+			// TODO Ensure that TreenodeViews are destroyed when the Treenodes are in existance but the containing TreeView isn't
+			this.Treenode.PropertyChanged += new PropertyChangedEventHandler(Treenode_PropertyChanged);
+
+			this.Parent = parent;
+
+			foreach (Treenode n in Treenode.Children.Cast<Treenode>()) {
+				children.Add(new TreenodeView(n, this));
+			}
+		}
+
+		~TreenodeView() {
+			if (this.Treenode != null) {
+				this.Treenode.PropertyChanged -= Treenode_PropertyChanged;
+			}
+		}
+
 		private ObservableCollection<TreenodeView> children = new ObservableCollection<TreenodeView>();
 
 		public Treenode Treenode { get; set; }
 
 		public TreenodeView Parent { get; set; }
-		
-		public TreenodeView(Treenode node, TreenodeView parent) {
-			this.Treenode = node;
-			this.Treenode.PropertyChanged += new PropertyChangedEventHandler(Treenode_PropertyChanged);
 
-			this.Parent = parent;
 
-			foreach (Treenode n in Treenode.NodeChildren.Cast<Treenode>()) {
-				children.Add(new TreenodeView(n, this));
-			}
-		}
 
 		void Treenode_PropertyChanged(object sender, PropertyChangedEventArgs e) {
 			if (PropertyChanged != null) {
@@ -141,6 +182,7 @@ namespace TreeViewer {
 
 		public string Title {
 			get {
+				if (Treenode.DataType == DataType.PointerCoupling) return Treenode.Title + " " + Treenode.NodeNumber;
 				return Treenode.Title;
 			}
 		}
@@ -194,14 +236,14 @@ namespace TreeViewer {
 					return "Images/Object.png";
 				} else if ((Treenode.Flags & Flags.CppFunc) == Flags.CppFunc) {
 					return "Images/CPP.png";
-				} else if ((Treenode.ExtendedFlags & FlagsExtended.DLLFunc) == FlagsExtended.DLLFunc) {
+				} else if ((Treenode.FlagsExtended & FlagsExtended.DLLFunc) == FlagsExtended.DLLFunc) {
 					return "Images/DLL.png";
-				} else if ((Treenode.ExtendedFlags & FlagsExtended.GlobalCPPFunc) == FlagsExtended.GlobalCPPFunc) {
+				} else if ((Treenode.FlagsExtended & FlagsExtended.GlobalCPPFunc) == FlagsExtended.GlobalCPPFunc) {
 					return "Images/GlobalCPP.png";
-				} else if((Treenode.ExtendedFlags & FlagsExtended.FlexScript) == FlagsExtended.FlexScript) {
+				} else if ((Treenode.FlagsExtended & FlagsExtended.FlexScript) == FlagsExtended.FlexScript) {
 					return "Images/Flexscript.png";
 				} else {
-					if(Treenode.NodeChildren.Count > 0) {
+					if (Treenode.NodeChildren.Count > 0) {
 						return "Images/Folder.png";
 					} else {
 						return "Images/Default.png";

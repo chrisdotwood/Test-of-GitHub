@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
 			Loaded="UserControl_Loaded"
 			 x:Name="MainUserControl"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300" xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit">
 	<UserControl.CommandBindings>
 		<CommandBinding Command="Open" CanExecute="OpenCommandBinding_CanExecute" Executed="OpenCommandBinding_Executed"/>
 		<CommandBinding Command="Save" CanExecute="SaveCommandBinding_CanExecute" Executed="SaveCommandBinding_Executed"/>
@@ -31,8 +31,9 @@
 			<local:FsmTreeView x:Name="RightFsmTree" Margin="5" SelectedItemChanged="RightFsmTree_SelectedItemChanged" Grid.Row="0" Grid.Column="1"/>
 			<DockPanel Grid.Row="1" Grid.Column="0">
 				<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Name="LeftTreePath" Background="LightGray"/>
-				<avalon:TextEditor DockPanel.Dock="Bottom" Grid.Row="1" Margin="5" Name="LeftCodeText" FontFamily="Consolas"/>
-			</DockPanel>
+				<avalon:TextEditor DockPanel.Dock="Right" Grid.Row="1" Margin="5" Name="LeftCodeText" FontFamily="Consolas"/>
+                <avalonedit:LineNumberMargin DockPanel.Dock="Left" Name="lineNumberMargin1"/>
+            </DockPanel>
 			<GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="2" Grid.ColumnSpan="2"/>
 			<GridSplitter HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="2" Grid.RowSpan="2"/>
 			<DockPanel Grid.Row="1" Grid.Column="1">

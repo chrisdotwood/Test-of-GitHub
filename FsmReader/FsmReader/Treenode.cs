@@ -67,6 +67,11 @@ namespace FsmReader {
 			DataChildren = new Collection<Treenode>();
 		}
 
+		private Treenode dummy;
+		private Treenode dataDummy;
+
+
+
 		#region Properties
 
 		public byte Version {
@@ -279,10 +284,10 @@ namespace FsmReader {
 			}
 
 			if (ret.Branch > 0) {
-				Treenode dataChild = _Read(stream, ref count);
+				ret.dummy =  _Read(stream, ref count);
 
-				uint dataNodesToRead = dataChild.Size;
-
+				uint dataNodesToRead = ret.dummy.Size;
+				
 				while (dataNodesToRead-- > 0) {
 					Treenode node = _Read(stream, ref count);
 					node.Parent = ret;
@@ -297,9 +302,9 @@ namespace FsmReader {
 			}
 
 			if (ret.DataType == DataType.Object) {
-				Treenode dataChild = _Read(stream, ref count);
+				ret.dataDummy = _Read(stream, ref count);
 
-				uint nodesToRead = dataChild.Size;
+				uint nodesToRead = ret.dataDummy.Size;
 
 				while (nodesToRead-- > 0) {
 					Treenode node = _Read(stream, ref count);
@@ -329,7 +334,7 @@ namespace FsmReader {
 			writer.Write((byte)root.Flags);
 
 			writer.Write(root.Title.Length + 1);
-			writer.Write(Encoding.ASCII.GetBytes(root.Title+ '\0'));
+			writer.Write(Encoding.ASCII.GetBytes(root.Title + '\0'));
 
 			writer.Write((uint)root.DataType);
 
@@ -350,7 +355,7 @@ namespace FsmReader {
 			if (root.DataType == DataType.ByteBlock) {
 				string str = (string)root.data;
 
-				writer.Write(str.Length+ 1);
+				writer.Write(str.Length + 1);
 				writer.Write(Encoding.ASCII.GetBytes(str + '\0'));
 			} else if (root.DataType == DataType.Float) {
 				writer.Write((double)root.data);
@@ -360,15 +365,9 @@ namespace FsmReader {
 
 			if (root.Branch > 0) {
 				Collection<Treenode> children = root.DataType == DataType.Object ? root.DataChildren : root.NodeChildren;
-				
-				Treenode dummy = new Treenode() {
-					Size = (uint)children.Count,
-					Title = "\0",
-					Version = 2,
-					DataType = DataType.Float,
-					data = (double)0
-				};
-				Write(dummy, file);
+
+				root.dummy.Size = (uint)children.Count;
+				Write(root.dummy, file);
 
 				foreach (Treenode child in children) {
 					Treenode.Write(child, file);
@@ -376,14 +375,16 @@ namespace FsmReader {
 			}
 
 			if (root.DataType == DataType.Object) {
-				Collection<Treenode> children = root.Branch == 0 ? root.DataChildren : root.NodeChildren;
+				Collection<Treenode> children;
 
-				Treenode dummy = new Treenode() {
-					Size = (uint)children.Count,
-					Title = "\0",
-					Version = 2
-				};
-				Write(dummy, file);
+				if (root.Branch == 0) {
+					children = root.DataChildren;
+				} else {
+					children = root.NodeChildren;
+				}
+
+				root.dataDummy.Size = (uint)children.Count;
+				Write(root.dataDummy, file);
 
 				foreach (Treenode child in children) {
 					Treenode.Write(child, file);
