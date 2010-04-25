@@ -143,14 +143,14 @@ namespace FsmReader {
 			}
 		}
 
-		public uint CppType { 
+		public uint CppType {
 			get;
-			set; 
+			set;
 		}
 
 		public uint Size {
 			get;
-			set; 
+			set;
 		}
 
 		//public List<Treenode> dataChildren = new List<Treenode>();
@@ -174,9 +174,9 @@ namespace FsmReader {
 			}
 		}
 
-		public Treenode Parent { 
-			get; 
-			set; 
+		public Treenode Parent {
+			get;
+			set;
 		}
 
 		public string FullPath {
@@ -192,9 +192,9 @@ namespace FsmReader {
 			}
 		}
 
-		public int NodeNumber { 
-			get; 
-			set; 
+		public int NodeNumber {
+			get;
+			set;
 		}
 
 		public object Data {
@@ -298,15 +298,40 @@ namespace FsmReader {
 
 		public static Treenode Read(Stream stream) {
 			int count = -1;
-			return _Read(stream, ref count);
+
+			// Key is node number of target, value is source
+			SortedList<int, List<Treenode>> couplings = new SortedList<int, List<Treenode>>();
+
+			SortedList<int, Treenode> nodeArray = new SortedList<int, Treenode>();
+			// Load the tree
+			Treenode root = _Read(stream, ref count, couplings, nodeArray);
+
+			// Connect the couplings
+			foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
+				Treenode target = nodeArray[kv.Key];
+
+				if (target != null) {
+					foreach (Treenode source in kv.Value) {
+						source.data = target;
+					}
+				} else {
+					Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
+					foreach (Treenode source in kv.Value) {
+						Console.WriteLine(source.FullPath);
+					}
+				}
+			}
+
+			return root;
 		}
 
-		private static Treenode _Read(Stream stream, ref int count) {
+		private static Treenode _Read(Stream stream, ref int count, SortedList<int, List<Treenode>> couplings, SortedList<int, Treenode> nodeArray) {
 			BinaryReader reader = new BinaryReader(stream);
 
 			Treenode ret = new Treenode();
 			ret.NodeNumber = count++;
-
+			nodeArray.Add(ret.NodeNumber, ret);
+	
 			ret.Version = reader.ReadByte();
 			ret.Flags = (Flags)Enum.ToObject(typeof(DataType), reader.ReadByte());
 
@@ -342,16 +367,25 @@ namespace FsmReader {
 			} else if (ret.DataType == DataType.Float) {
 				ret.data = reader.ReadDouble();
 			} else if (ret.DataType == DataType.PointerCoupling) {
-				ret.data = reader.ReadUInt32();
+				int targetNumber = (int)reader.ReadUInt32();
+				ret.data = targetNumber;
+
+				if (targetNumber > 0) {
+					if (couplings.ContainsKey(targetNumber)) {
+						couplings[targetNumber].Add(ret);
+					} else {
+						couplings.Add(targetNumber, new List<Treenode>() { ret });
+					}
+				}
 			}
 
 			if (ret.Branch > 0) {
-				ret.childSizeNode = _Read(stream, ref count);
+				ret.childSizeNode = _Read(stream, ref count, couplings, nodeArray);
 
 				uint dataNodesToRead = ret.childSizeNode.Size;
 
 				while (dataNodesToRead-- > 0) {
-					Treenode node = _Read(stream, ref count);
+					Treenode node = _Read(stream, ref count, couplings, nodeArray);
 					node.Parent = ret;
 
 					if (ret.DataType == DataType.Object) {
@@ -363,12 +397,12 @@ namespace FsmReader {
 			}
 
 			if (ret.DataType == DataType.Object) {
-				ret.dataSizeNode = _Read(stream, ref count);
+				ret.dataSizeNode = _Read(stream, ref count, couplings, nodeArray);
 
 				uint nodesToRead = ret.dataSizeNode.Size;
 
 				while (nodesToRead-- > 0) {
-					Treenode node = _Read(stream, ref count);
+					Treenode node = _Read(stream, ref count, couplings, nodeArray);
 					node.Parent = ret;
 
 					if (ret.Branch > 0) {

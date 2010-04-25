@@ -22,6 +22,7 @@
                     <StackPanel Orientation="Horizontal" ContextMenu="{StaticResource ContextMenu}">
                         <Image Source="{Binding IconPath, NotifyOnSourceUpdated=True}" Margin="3,0"/>
                         <TextBlock Text="{Binding Path=Title}" Margin="3,0"/>
+                        
                         <!--TextBlock Text="{Binding Path=DataAsString}" Visibility="{Binding Path=IsSelected, Converter={StaticResource visibilityConverter}}"/-->
                     </StackPanel>
                 </HierarchicalDataTemplate>

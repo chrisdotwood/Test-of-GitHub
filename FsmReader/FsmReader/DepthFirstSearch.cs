@@ -22,14 +22,11 @@ namespace FsmReader {
 			
 			root.Accept(this, stack);
 
-			Console.WriteLine(result.FullPath);
-
 			lastResult = result;
 			return result;
 		}
 
 		#region IVisitor Members
-
 
 		public bool VisitEnter(Composite composite) {
 			Treenode node = (Treenode)composite;
