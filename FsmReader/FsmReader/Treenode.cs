@@ -307,20 +307,20 @@ namespace FsmReader {
 			Treenode root = _Read(stream, ref count, couplings, nodeArray);
 
 			// Connect the couplings
-			foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
-				Treenode target = nodeArray[kv.Key];
+			//foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
+			//    Treenode target = nodeArray[kv.Key];
 
-				if (target != null) {
-					foreach (Treenode source in kv.Value) {
-						source.data = target;
-					}
-				} else {
-					Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
-					foreach (Treenode source in kv.Value) {
-						Console.WriteLine(source.FullPath);
-					}
-				}
-			}
+			//    if (target != null) {
+			//        foreach (Treenode source in kv.Value) {
+			//            source.data = target;
+			//        }
+			//    } else {
+			//        Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
+			//        foreach (Treenode source in kv.Value) {
+			//            Console.WriteLine(source.FullPath);
+			//        }
+			//    }
+			//}
 
 			return root;
 		}
@@ -454,7 +454,7 @@ namespace FsmReader {
 			} else if (root.DataType == DataType.Float) {
 				writer.Write((double)root.data);
 			} else if (root.DataType == DataType.PointerCoupling) {
-				writer.Write((uint)root.data);
+				writer.Write((uint)(int)root.data);
 			}
 
 			if (root.Branch > 0) {

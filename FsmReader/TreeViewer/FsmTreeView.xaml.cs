@@ -82,8 +82,8 @@ namespace TreeViewer {
 				foreach (TreenodeView n in items) {
 					if (n.Treenode == node) {
 						item = n;
-						if (item.TreenodeViewParent != null) {
-							item.TreenodeViewParent.IsExpanded = true;
+						if (item.Parent != null) {
+							item.Parent.IsExpanded = true;
 						}
 						break;
 					}

@@ -3,14 +3,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="clr-namespace:TreeViewer"
 	xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
-    xmlns:r="clr-namespace:Microsoft.Windows.Controls.Ribbon;assembly=RibbonControlsLibrary"
     Title="Window1" Height="548" Width="612" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <r:Ribbon>
+        <!--r:Ribbon>
             <r:Ribbon.Resources>
                 <r:RibbonCommand x:Key="SaveCommand"
                            CanExecute="SaveCommand_CanExecute"
@@ -29,7 +28,7 @@
                    
                 </r:RibbonGroup>
             </r:RibbonTab>
-        </r:Ribbon>
+        </r:Ribbon-->
         <local:TreeDiffControl Grid.Row="1"/>
 
         <!--Grid.RowDefinitions>

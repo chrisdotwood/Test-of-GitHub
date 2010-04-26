@@ -21,6 +21,10 @@ namespace TreeViewer {
 		public TreenodeFlagControl() {
 			InitializeComponent();
 		}
+
+		private void UserControl_Loaded(object sender, RoutedEventArgs e) {
+
+		}
 	}
 
 	public class FlagsToCheckedConverter : IValueConverter {

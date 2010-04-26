@@ -6,45 +6,37 @@
              mc:Ignorable="d"
 			 xmlns:fsm="clr-namespace:FsmReader;assembly=FsmReader"
 			 xmlns:local="clr-namespace:TreeViewer"
-             d:DesignHeight="245" d:DesignWidth="692">
-    <UserControl.Resources>
-        <local:DataTypeToCheckedConverter x:Key="DataTypeConverter"/>
-        <local:FlagsToCheckedConverter x:Key="FlagConverter"/>
-        <local:FlagsExtendedToCheckedConverter x:Key="FlagsExtendedConverter"/>
-    </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" Height="81" Width="575">
-        <GroupBox Header="Data Type">
-            <StackPanel Orientation="Horizontal">
-                <StackPanel>
-                    <RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=Float, Converter={StaticResource DataTypeConverter}}">Float</RadioButton>
-                    <RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=ByteBlock, Converter={StaticResource DataTypeConverter}}">String</RadioButton>
-                </StackPanel>
-                <StackPanel>
-                    <RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=PointerCoupling, Converter={StaticResource DataTypeConverter}}">Coupling</RadioButton>
-                    <RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=Object, Converter={StaticResource DataTypeConverter}}">Object</RadioButton>
-                </StackPanel>
-                <RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=None, Converter={StaticResource DataTypeConverter}}">None</RadioButton>
-            </StackPanel>
-        </GroupBox>
-        <GroupBox Header="Flags" Margin="5,0">
-            <StackPanel Orientation="Horizontal">
-                <StackPanel>
-                    <CheckBox Margin="5,2" IsChecked="{Binding Path=Flags, ConverterParameter=CppFunc, Converter={StaticResource FlagConverter}}">C++</CheckBox>
-                    <CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=Flexscript, Converter={StaticResource FlagsExtendedConverter}}">Flexscript</CheckBox>
-                </StackPanel>
-                <StackPanel>
-                    <CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=DLLFunc, Converter={StaticResource FlagsExtendedConverter}}">DLL Function</CheckBox>
-                    <CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=GlobalCPPFunc, Converter={StaticResource FlagsExtendedConverter}}">Global C++</CheckBox>
-                </StackPanel>
-                <StackPanel>
-                    <CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=Hidden, Converter={StaticResource FlagsExtendedConverter}}">Hidden</CheckBox>
-                    <CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=Protected, Converter={StaticResource FlagsExtendedConverter}}">Protected</CheckBox>
-                </StackPanel>
-                <StackPanel>
-                    <CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=ODTDerivative, Converter={StaticResource FlagsExtendedConverter}}">ODT Derivative</CheckBox>
-                    <CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=HideContent, Converter={StaticResource FlagsExtendedConverter}}">Hide Content</CheckBox>
-                </StackPanel>
-            </StackPanel>
-        </GroupBox>
-    </StackPanel>
+             d:DesignHeight="245" d:DesignWidth="692" Loaded="UserControl_Loaded">
+	<UserControl.Resources>
+		<local:DataTypeToCheckedConverter x:Key="DataTypeConverter"/>
+		<local:FlagsToCheckedConverter x:Key="FlagConverter"/>
+		<local:FlagsExtendedToCheckedConverter x:Key="FlagsExtendedConverter"/>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="2*"/>
+		</Grid.ColumnDefinitions>
+		<GroupBox Header="Data Type">
+			<WrapPanel ItemWidth="70">
+				<RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=Float, Converter={StaticResource DataTypeConverter}}">Float</RadioButton>
+				<RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=ByteBlock, Converter={StaticResource DataTypeConverter}}">String</RadioButton>
+				<RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=PointerCoupling, Converter={StaticResource DataTypeConverter}}">Coupling</RadioButton>
+				<RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=Object, Converter={StaticResource DataTypeConverter}}">Object</RadioButton>
+				<RadioButton Margin="5,2" GroupName="DataType" IsChecked="{Binding Path=DataType, ConverterParameter=None, Converter={StaticResource DataTypeConverter}}">None</RadioButton>
+			</WrapPanel>
+		</GroupBox>
+		<GroupBox Header="Flags" Margin="5,0" Grid.Column="1">
+			<WrapPanel ItemWidth="100">
+				<CheckBox Margin="5,2" IsChecked="{Binding Path=Flags, ConverterParameter=CppFunc, Converter={StaticResource FlagConverter}}">C++</CheckBox>
+				<CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=Flexscript, Converter={StaticResource FlagsExtendedConverter}}">Flexscript</CheckBox>
+				<CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=DLLFunc, Converter={StaticResource FlagsExtendedConverter}}">DLL Function</CheckBox>
+				<CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=GlobalCPPFunc, Converter={StaticResource FlagsExtendedConverter}}">Global C++</CheckBox>
+				<CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=Hidden, Converter={StaticResource FlagsExtendedConverter}}">Hidden</CheckBox>
+				<CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=Protected, Converter={StaticResource FlagsExtendedConverter}}">Protected</CheckBox>
+				<CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=ODTDerivative, Converter={StaticResource FlagsExtendedConverter}}">ODT Derivative</CheckBox>
+				<CheckBox Margin="5,2" IsChecked="{Binding Path=FlagsExtended, ConverterParameter=HideContent, Converter={StaticResource FlagsExtendedConverter}}">Hide Content</CheckBox>
+			</WrapPanel>
+		</GroupBox>
+	</Grid>
 </UserControl>

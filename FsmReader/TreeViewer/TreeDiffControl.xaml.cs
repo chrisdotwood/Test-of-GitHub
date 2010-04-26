@@ -17,6 +17,7 @@ using FsmReader;
 using ICSharpCode.AvalonEdit.Highlighting;
 using Diff;
 using Microsoft.Win32;
+using ICSharpCode.AvalonEdit;
 
 namespace TreeViewer {
 	/// <summary>
@@ -47,15 +48,24 @@ namespace TreeViewer {
 			loadFileWorker2.RunWorkerCompleted += new RunWorkerCompletedEventHandler(loadFileWorker_RunWorkerCompleted);
 		}
 
+		private void UserControl_Loaded(object sender, RoutedEventArgs e) {
+			LeftCodeText.ScrollViewer.ScrollChanged += new ScrollChangedEventHandler(LeftCodeScrolled);
+		}
+
 		#region Load File Worker
 
 		private class LoadFileWorkerArgument {
 			public string Path;
 			public FsmTreeView Target;
+			public TextBlock PathText;
 		}
 
 		void loadFileWorker_DoWork(object sender, DoWorkEventArgs e) {
 			LoadFileWorkerArgument arg = (LoadFileWorkerArgument)e.Argument;
+
+			if (arg.PathText != null) {
+
+			}
 
 			using (FileStream stream = new FileStream(arg.Path, FileMode.Open)) {
 				e.Result = Treenode.Read(stream);
@@ -73,64 +83,7 @@ namespace TreeViewer {
 		}
 
 		#endregion
-
-		private void UserControl_Loaded(object sender, RoutedEventArgs e) {
-			LeftCodeText.ScrollViewer.ScrollChanged += new ScrollChangedEventHandler(LeftCodeScrolled);
-		}
-
-		private void LeftCodeScrolled(object sender, ScrollChangedEventArgs args) {
-			RightCodeText.ScrollToVerticalOffset(args.VerticalOffset);
-		}
 	
-		private void LeftFsmTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
-			TreenodeView node = ((FsmTreeView)sender).SelectedItem;
-			if (node == null) {
-				LeftCodeText.Text = "";
-				LeftTreePath.Text = "No Node Selected";
-			} else {
-				LeftCodeText.Text = node.Treenode.Data == null ? "" : node.Treenode.Data.ToString();
-				LeftTreePath.Text = node.Treenode.FullPath;
-				LeftFlags.DataContext = node.Treenode;
-
-				Treenode rightRoot = (Treenode)RightFsmTree.Tree.DataContext;
-				Treenode rightNode = Treenode.NodeFromPath(node.Treenode.FullPath, rightRoot);
-				if (rightNode != null) {
-					RightFsmTree.SelectNode(rightNode);
-					
-					DiffCode();
-				}
-			}
-		}
-
-		private void RightFsmTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
-			TreenodeView node = ((FsmTreeView)sender).SelectedItem;
-			if (node == null) {
-				RightCodeText.Text = "";
-				RightTreePath.Text = "No Node Selected";
-			} else {
-				RightCodeText.Text = node.Treenode.Data == null ? "" : node.Treenode.Data.ToString();
-				RightTreePath.Text = node.Treenode.FullPath;
-				RightFlags.DataContext = node.Treenode;
-			}
-		}
-
-		private void DiffCode() {
-			List<Change> changes = new Lcs().Diff(new DiffDocument(LeftCodeText.Text), new DiffDocument(RightCodeText.Text));
-			
-			foreach (Change c in changes) {
-				if (c.Type == ChangeType.Remove) {
-					int start = LeftCodeText.Document.GetLineByNumber(c.StartPosition1).Offset;
-					int end = LeftCodeText.Document.GetLineByNumber(c.EndPosition1).Offset;
-					LeftCodeText.Select(start, end - start);
-
-					Console.WriteLine(c.ToString());
-					Console.WriteLine("----------------------------------------------------------------------------");
-
-					break;
-				}
-			}
-		}
-
 		#region Command Binding Event Handlers
 
 		private void MatchScrollingCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
@@ -153,14 +106,16 @@ namespace TreeViewer {
 					Path = ofd.LeftPath,
 					Target = LeftFsmTree
 				});
+
+				LeftStatusText.Text = ofd.LeftPath;
 				loadFileWorker2.RunWorkerAsync(new LoadFileWorkerArgument() {
 					Path = ofd.RightPath,
 					Target = RightFsmTree
 				});
+				RightStatusText.Text = ofd.RightPath;
 			}
 			e.Handled = true;
 		}
-
 	
 		private void SaveCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
 			e.Handled = e.CanExecute = true;
@@ -179,12 +134,96 @@ namespace TreeViewer {
 
 		#endregion
 
-		private void LeftCodeText_TextChanged(object sender, EventArgs e) {
-			if (LeftFsmTree.SelectedItem == null) return;
+		#region Tree Event Handlers
 
-			if(LeftFsmTree.SelectedItem.Treenode.DataType == DataType.ByteBlock) {
-				LeftFsmTree.SelectedItem.Treenode.Data = LeftCodeText.Text;
+		private void LeftFsmTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
+			TreenodeView node = ((FsmTreeView)sender).SelectedItem;
+			if (node == null) {
+				LeftCodeText.Text = "";
+				LeftTreePath.Text = "No Node Selected";
+			} else {
+				LeftCodeText.Text = node.Treenode.Data == null ? "" : node.Treenode.Data.ToString();
+				LeftTreePath.Text = node.Treenode.FullPath;
+				LeftFlags.DataContext = node.Treenode;
+
+				Treenode rightRoot = (Treenode)RightFsmTree.Tree.DataContext;
+				Treenode rightNode = Treenode.NodeFromPath(node.Treenode.FullPath, rightRoot);
+				if (rightNode != null) {
+					RightFsmTree.SelectNode(rightNode);
+
+					DiffCode();
+				}
 			}
 		}
+
+		private void RightFsmTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
+			TreenodeView node = ((FsmTreeView)sender).SelectedItem;
+			if (node == null) {
+				RightCodeText.Text = "";
+				RightTreePath.Text = "No Node Selected";
+			} else {
+				RightCodeText.Text = node.Treenode.Data == null ? "" : node.Treenode.Data.ToString();
+				RightTreePath.Text = node.Treenode.FullPath;
+				RightFlags.DataContext = node.Treenode;
+			}
+		}
+
+		#endregion
+
+		#region Text Editor Event Handlers
+		
+		private void LeftCodeScrolled(object sender, ScrollChangedEventArgs args) {
+			RightCodeText.ScrollToVerticalOffset(args.VerticalOffset);
+		}
+
+		private void LeftCodeText_TextChanged(object sender, EventArgs e) {
+			HandleTextChanged(LeftFsmTree, LeftCodeText);
+		}
+
+		private void RightCodeText_TextChanged(object sender, EventArgs e) {
+			HandleTextChanged(RightFsmTree, RightCodeText);
+		}
+
+		#endregion
+
+		#region Utility Methods
+
+		private void HandleTextChanged(FsmTreeView tree, TextEditor text) {
+			if (tree.SelectedItem == null) return;
+
+			Treenode node = tree.SelectedItem.Treenode;
+			if (node.DataType == DataType.ByteBlock) {
+				node.DataAsString = text.Text;
+			} else if (node.DataType == DataType.Float) {
+				double val;
+				if (double.TryParse(text.Text, out val)) {
+
+					text.Background = Brushes.White;
+					node.DataAsDouble = val;
+				} else {
+					text.Background = Brushes.Maroon;
+				}
+			}
+		}
+
+		private void DiffCode() {
+			List<Change> changes = new Lcs().Diff(new DiffDocument(LeftCodeText.Text), new DiffDocument(RightCodeText.Text));
+
+			foreach (Change c in changes) {
+				if (c.Type == ChangeType.Remove) {
+					int start = LeftCodeText.Document.GetLineByNumber(c.StartPosition1).Offset;
+					int end = LeftCodeText.Document.GetLineByNumber(c.EndPosition1).Offset;
+					LeftCodeText.Select(start, end - start);
+
+					Console.WriteLine(c.ToString());
+					Console.WriteLine("----------------------------------------------------------------------------");
+
+					break;
+				}
+			}
+		}
+
+		#endregion
+
 	}
 }
