@@ -6,7 +6,7 @@
              mc:Ignorable="d"
 			 xmlns:fsm="clr-namespace:FsmReader;assembly=FsmReader"
 			 xmlns:local="clr-namespace:TreeViewer"
-             d:DesignHeight="245" d:DesignWidth="692" Loaded="UserControl_Loaded">
+             d:DesignHeight="73" d:DesignWidth="699" Loaded="UserControl_Loaded">
 	<UserControl.Resources>
 		<local:DataTypeToCheckedConverter x:Key="DataTypeConverter"/>
 		<local:FlagsToCheckedConverter x:Key="FlagConverter"/>

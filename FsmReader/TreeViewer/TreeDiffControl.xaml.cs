@@ -57,15 +57,18 @@ namespace TreeViewer {
 		private class LoadFileWorkerArgument {
 			public string Path;
 			public FsmTreeView Target;
-			public TextBlock PathText;
 		}
 
 		void loadFileWorker_DoWork(object sender, DoWorkEventArgs e) {
 			LoadFileWorkerArgument arg = (LoadFileWorkerArgument)e.Argument;
-
-			if (arg.PathText != null) {
-
-			}
+			
+			// Free the memory from the existing trees
+			this.Dispatcher.BeginInvoke(new Action(() => {
+				if (arg.Target.DataContext != null) {
+					arg.Target.DataContext = null;
+					System.GC.Collect();
+				}
+			}), null);
 
 			using (FileStream stream = new FileStream(arg.Path, FileMode.Open)) {
 				e.Result = Treenode.Read(stream);
@@ -86,6 +89,50 @@ namespace TreeViewer {
 	
 		#region Command Binding Event Handlers
 
+		private void SearchCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
+			e.Handled = e.CanExecute = true;
+			return;
+			// TODO Re-instate the checks
+			
+			if (LeftFsmTree == null || RightFsmTree == null) {
+				e.Handled = e.CanExecute = false;
+				return;
+			}
+
+			e.Handled = e.CanExecute = LeftFsmTree.DataContext != null && RightFsmTree.DataContext != null;
+		}
+
+		DepthFirstSearch searchDpt;
+		private void SearchCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
+			SearchDialog d = new SearchDialog(LeftFsmTree.DataContext as Treenode);
+			d.ShowDialog();
+
+			return;
+			if (searchDpt == null) {
+				searchDpt = new DepthFirstSearch(LeftFsmTree.DataContext as Treenode);
+			}
+			Treenode result = searchDpt.FindNode(SearchCriteria);
+			if (result != null) {
+				LeftFsmTree.SelectNode(result);
+			}
+		}
+
+		private bool SearchCriteria(Treenode node) {
+			if ((node.Flags & Flags.CppFunc) == Flags.CppFunc) {
+				Treenode rightRoot = (Treenode) RightFsmTree.DataContext;
+
+				Treenode otherNode = Treenode.NodeFromPath(node.FullPath, rightRoot);
+				if (otherNode == null) {
+					Console.WriteLine("Node " + node.FullPath + " doesn't exist in right tree");
+					return true;
+				} else if(otherNode.DataAsString != node.DataAsString) {
+					Console.WriteLine("Node " + node.FullPath + " differs");
+					return true;
+				}
+			}
+			return false;
+		}
+
 		private void MatchScrollingCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
 			e.CanExecute = e.Handled = true;
 		}
@@ -102,6 +149,8 @@ namespace TreeViewer {
 			OpenTwoFilesDialog ofd = new OpenTwoFilesDialog();
 			bool? result = ofd.ShowDialog();
 			if (result.HasValue && result.Value == true) {
+				searchDpt = null;
+
 				loadFileWorker.RunWorkerAsync( new LoadFileWorkerArgument() {
 					Path = ofd.LeftPath,
 					Target = LeftFsmTree
@@ -210,16 +259,17 @@ namespace TreeViewer {
 			List<Change> changes = new Lcs().Diff(new DiffDocument(LeftCodeText.Text), new DiffDocument(RightCodeText.Text));
 
 			foreach (Change c in changes) {
-				if (c.Type == ChangeType.Remove) {
-					int start = LeftCodeText.Document.GetLineByNumber(c.StartPosition1).Offset;
-					int end = LeftCodeText.Document.GetLineByNumber(c.EndPosition1).Offset;
-					LeftCodeText.Select(start, end - start);
+				//if (c.Type == ChangeType.Remove) {
+				//    int start = LeftCodeText.Document.GetLineByNumber(c.StartPosition1).Offset;
+				//    int end = LeftCodeText.Document.GetLineByNumber(c.EndPosition1).Offset;
+				//    LeftCodeText.Select(start, end - start);
 
-					Console.WriteLine(c.ToString());
-					Console.WriteLine("----------------------------------------------------------------------------");
+					
+				//    break;
+				//}
+				//Console.WriteLine(c.ToString());
+				//Console.WriteLine("----------------------------------------------------------------------------");
 
-					break;
-				}
 			}
 		}
 

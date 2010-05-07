@@ -17,7 +17,7 @@ namespace FsmReader {
             // Reverse the stack
             Stack<int> resumeStack = new Stack<int>(stack.AsEnumerable());
 
-            bool result = Accept(visitor, inStack, resumeStack);
+			bool result = Accept(visitor, inStack, resumeStack);
 
 			stack.Clear();
 			foreach (int i in inStack) {
@@ -40,13 +40,10 @@ namespace FsmReader {
                 }
 
                 for (int i = firstChild; i < Children.Count; i++) {
-                    inStack.Push(i);
-
                     Composite c = Children[i];
-                    if (!c.Accept(visitor, inStack, resumeStack)) {
+					if (!c.Accept(visitor, inStack, resumeStack)) {
+						inStack.Push(i);
                         break;
-                    } else {
-                        inStack.Pop();
                     }
                 }
             }

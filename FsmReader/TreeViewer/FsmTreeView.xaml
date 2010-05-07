@@ -15,7 +15,7 @@
         <Grid.CommandBindings>
             <CommandBinding Command="SaveAs" CanExecute="SaveAsCommandBinding_CanExecute" Executed="SaveAsCommandBinding_Executed" />
         </Grid.CommandBindings>
-		<TreeView Name="Tree" SelectedItemChanged="tree_SelectedItemChanged">
+		<TreeView Name="Tree" SelectedItemChanged="tree_SelectedItemChanged" VirtualizingStackPanel.IsVirtualizing="True">
             <TreeView.Resources>
                 <local:BooleanToVisibilityConverter x:Key="visibilityConverter"/>
                 <HierarchicalDataTemplate DataType="{x:Type local:TreenodeView}" ItemsSource="{Binding Children}">

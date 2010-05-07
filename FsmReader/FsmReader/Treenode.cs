@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace FsmReader {
 	#region Enums
 
-	public enum DataType {
+	public enum DataType : byte {
 		None = 0,
 		Float = 1,
 		ByteBlock = 2,
@@ -21,7 +21,8 @@ namespace FsmReader {
 	}
 
 	[Flags]
-	public enum Flags {
+	public enum Flags : byte {
+		None = 0x00,
 		Expanded = 0x01,
 		HasOwner = 0x02,
 		CppFunc = 0x04,
@@ -33,7 +34,8 @@ namespace FsmReader {
 	}
 
 	[Flags]
-	public enum FlagsExtended {
+	public enum FlagsExtended : uint {
+		None = 0x0,
 		ShowObject = 0x00000001,
 		Selected = 0x00000002,
 		Flexscript = 0x00000004,
@@ -73,10 +75,7 @@ namespace FsmReader {
 
 		#region Properties
 
-		public byte Version {
-			get;
-			set;
-		}
+		public byte Version;
 
 		private string title = "";
 		public string Title {
@@ -131,27 +130,13 @@ namespace FsmReader {
 			}
 		}
 
-		public uint Branch { get; set; }
+		public byte Branch;
 
-		private uint indexCache;
-		public uint IndexCache {
-			get {
-				return indexCache;
-			}
-			set {
-				indexCache = value;
-			}
-		}
+		public uint IndexCache;
 
-		public uint CppType {
-			get;
-			set;
-		}
+		public uint CppType;
 
-		public uint Size {
-			get;
-			set;
-		}
+		public uint Size;
 
 		//public List<Treenode> dataChildren = new List<Treenode>();
 		public Collection<Treenode> NodeChildren {
@@ -174,10 +159,7 @@ namespace FsmReader {
 			}
 		}
 
-		public Treenode Parent {
-			get;
-			set;
-		}
+		public Treenode Parent;
 
 		public string FullPath {
 			get {
@@ -192,11 +174,6 @@ namespace FsmReader {
 			}
 		}
 
-		public int NodeNumber {
-			get;
-			set;
-		}
-
 		public object Data {
 			get {
 				return data;
@@ -208,8 +185,6 @@ namespace FsmReader {
 
 		public string DataAsString {
 			get {
-				Debug.Assert(DataType == FsmReader.DataType.ByteBlock);
-
 				if (data != null) {
 					return data.ToString();
 				} else {
@@ -306,7 +281,10 @@ namespace FsmReader {
 			// Load the tree
 			Treenode root = _Read(stream, ref count, couplings, nodeArray);
 
+			Console.WriteLine("Read " + count + " nodes");
+
 			// Connect the couplings
+			// May need to check bi-directionality of these
 			//foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
 			//    Treenode target = nodeArray[kv.Key];
 
@@ -329,9 +307,8 @@ namespace FsmReader {
 			BinaryReader reader = new BinaryReader(stream);
 
 			Treenode ret = new Treenode();
-			ret.NodeNumber = count++;
-			nodeArray.Add(ret.NodeNumber, ret);
-	
+			nodeArray.Add(count++, ret);
+
 			ret.Version = reader.ReadByte();
 			ret.Flags = (Flags)Enum.ToObject(typeof(DataType), reader.ReadByte());
 
@@ -342,7 +319,7 @@ namespace FsmReader {
 
 			ret.DataType = (DataType)Enum.ToObject(typeof(DataType), reader.ReadUInt32());
 
-			ret.Branch = reader.ReadUInt32();
+			ret.Branch = (byte)reader.ReadUInt32();
 
 			if ((ret.Flags & Flags.FlagsExtended) == Flags.FlagsExtended) {
 				ret.FlagsExtended = (FlagsExtended)Enum.ToObject(typeof(FlagsExtended), reader.ReadUInt32());
@@ -432,7 +409,7 @@ namespace FsmReader {
 
 			writer.Write((uint)root.DataType);
 
-			writer.Write(root.Branch);
+			writer.Write((uint)root.Branch);
 
 			if ((root.Flags & Flags.FlagsExtended) == Flags.FlagsExtended) {
 				writer.Write((uint)root.FlagsExtended);

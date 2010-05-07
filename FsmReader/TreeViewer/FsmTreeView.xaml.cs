@@ -97,7 +97,11 @@ namespace TreeViewer {
 		}
 
 		private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
-			Tree.ItemsSource = new ObservableCollection<TreenodeView> { new TreenodeView((Treenode)e.NewValue, null) };
+			if (e.NewValue == null) {
+				Tree.ItemsSource = null;
+			} else {
+				Tree.ItemsSource = new ObservableCollection<TreenodeView> { new TreenodeView((Treenode)e.NewValue, null) };
+			}
 		}
 
 		private void tree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {

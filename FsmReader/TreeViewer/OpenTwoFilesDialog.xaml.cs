@@ -76,7 +76,7 @@ namespace TreeViewer {
 		}
 
 		private void CancelButton_Click(object sender, RoutedEventArgs e) {
-			this.DialogResult = true;
+			this.DialogResult = false;
 			Close();
 		}
 	}

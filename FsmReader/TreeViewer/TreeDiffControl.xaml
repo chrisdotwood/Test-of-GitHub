@@ -12,24 +12,40 @@
 	<UserControl.CommandBindings>
 		<CommandBinding Command="Open" CanExecute="OpenCommandBinding_CanExecute" Executed="OpenCommandBinding_Executed"/>
 		<CommandBinding Command="Save" CanExecute="SaveCommandBinding_CanExecute" Executed="SaveCommandBinding_Executed"/>
+		<CommandBinding Command="Search" CanExecute="SearchCommandBinding_CanExecute" Executed="SearchCommandBinding_Executed"/>
 	</UserControl.CommandBindings>
 	<DockPanel>
 		<ToolBar DockPanel.Dock="Top">
 			<Button Margin="3" Command="Open">Open</Button>
 			<Button Margin="3" Command="Save">Save</Button>
+			<Button Margin="3" Command="Search">Search</Button>
 		</ToolBar>
+
 		<Grid DockPanel.Dock="Bottom">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
-				<RowDefinition Height="Auto" />
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
-			<local:FsmTreeView x:Name="LeftFsmTree" Margin="5" SelectedItemChanged="LeftFsmTree_SelectedItemChanged" Grid.Row="0" Grid.Column="0" />
-			<local:FsmTreeView x:Name="RightFsmTree" Margin="5" SelectedItemChanged="RightFsmTree_SelectedItemChanged" Grid.Row="0" Grid.Column="1"/>
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<local:FsmTreeView x:Name="LeftFsmTree" Margin="5" SelectedItemChanged="LeftFsmTree_SelectedItemChanged" />
+				<local:TreenodeFlagControl Margin="5,0,5,5"  Grid.Row="1" x:Name="LeftFlags" />
+			</Grid>
+			<Grid Grid.Column="1">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<local:FsmTreeView x:Name="RightFsmTree" Margin="5" SelectedItemChanged="RightFsmTree_SelectedItemChanged" />
+				<local:TreenodeFlagControl Margin="5,0,5,5" Grid.Row="1" x:Name="RightFlags" />
+			</Grid>
 			<DockPanel Grid.Row="2" Grid.Column="0">
 				<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Name="LeftTreePath" Background="LightGray"/>
 				<StatusBar DockPanel.Dock="Bottom">
@@ -37,12 +53,7 @@
 				</StatusBar>
 				<avalon:TextEditor DockPanel.Dock="Right" TextChanged="LeftCodeText_TextChanged" Margin="5" Name="LeftCodeText" FontFamily="Consolas"/>
 			</DockPanel>
-			<!--Expander Grid.Row="1" Header="Node Settings" Grid.ColumnSpan="2"-->
-
-			<local:TreenodeFlagControl Grid.Row="1" Grid.Column="0" x:Name="LeftFlags" />
-			<local:TreenodeFlagControl Grid.Row="1" Grid.Column="1" DockPanel.Dock="Right" x:Name="RightFlags" />
-			<!--/Expander-->
-			<GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Bottom" Height="2" Grid.ColumnSpan="2"/>
+			<GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="2" Grid.ColumnSpan="2"/>
 			<DockPanel Grid.Row="2" Grid.Column="1">
 				<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Name="RightTreePath" Background="LightGray"/>
 				<StatusBar DockPanel.Dock="Bottom">
