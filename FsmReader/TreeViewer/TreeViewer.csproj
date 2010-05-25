@@ -126,6 +126,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CommandViewModel.cs" />
     <Compile Include="Converters.cs" />
     <Compile Include="OpenTwoFilesDialog.xaml.cs">
       <DependentUpon>OpenTwoFilesDialog.xaml</DependentUpon>
@@ -144,6 +145,7 @@
       <DependentUpon>TreenodeFlagControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="TreenodeView.cs" />
+    <Compile Include="ViewModelBase.cs" />
     <Compile Include="Window1.xaml.cs">
       <DependentUpon>Window1.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -188,6 +190,10 @@
     <ProjectReference Include="..\FsmReader\FsmReader.csproj">
       <Project>{F5BF960E-37A7-4D0C-B64B-5542D3070141}</Project>
       <Name>FsmReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WeakEvents\WeakEvents.csproj">
+      <Project>{CEE328E8-556D-4F00-AC03-3177C9C4E084}</Project>
+      <Name>WeakEvents</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

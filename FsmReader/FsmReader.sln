@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+# Visual C# Express 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FsmReader", "FsmReader\FsmReader.csproj", "{F5BF960E-37A7-4D0C-B64B-5542D3070141}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TreeViewer", "TreeViewer\TreeViewer.csproj", "{443B0B7D-B401-4C81-A870-E0291680EAB0}"
@@ -8,6 +8,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICSharpCode.AvalonEdit", "AvalonEdit\ICSharpCode.AvalonEdit\ICSharpCode.AvalonEdit.csproj", "{6C55B776-26D4-4DB3-A6AB-87E783B2F3D1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diff", "Diff\Diff.csproj", "{468ACA40-50A5-4B1E-AC4B-8E543EC2DDF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeakEvents", "WeakEvents\WeakEvents.csproj", "{CEE328E8-556D-4F00-AC03-3177C9C4E084}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,10 @@ Global
 		{468ACA40-50A5-4B1E-AC4B-8E543EC2DDF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{468ACA40-50A5-4B1E-AC4B-8E543EC2DDF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{468ACA40-50A5-4B1E-AC4B-8E543EC2DDF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEE328E8-556D-4F00-AC03-3177C9C4E084}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEE328E8-556D-4F00-AC03-3177C9C4E084}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEE328E8-556D-4F00-AC03-3177C9C4E084}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEE328E8-556D-4F00-AC03-3177C9C4E084}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

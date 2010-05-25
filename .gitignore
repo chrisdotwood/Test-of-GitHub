@@ -1,0 +1,10 @@
+obj/
+bin/
+*.dll
+*.exe
+*.pdb
+*.fsm
+*.t
+FsmReader/TreeViewer/obj/
+*.suo
+FsmReader/Backup/

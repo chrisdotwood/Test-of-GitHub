@@ -71,6 +71,7 @@
     <Compile Include="DepthFirstSearch.cs" />
     <Compile Include="Composite.cs" />
     <Compile Include="IVisitor.cs" />
+    <Compile Include="RootTreeNode.cs" />
     <Compile Include="Treenode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

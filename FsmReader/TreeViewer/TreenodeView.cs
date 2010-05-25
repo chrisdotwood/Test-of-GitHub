@@ -3,13 +3,14 @@ using FsmReader;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
+using SmartWeakEvent;
 
 namespace TreeViewer {
 	public class TreenodeView : INotifyPropertyChanged {
 		private ObservableCollection<TreenodeView> children = new ObservableCollection<TreenodeView>();
 		public Treenode Treenode { get; set; }
 		public TreenodeView Parent { get; set; }
-		
+
 		public TreenodeView(Treenode node, TreenodeView parent) {
 			this.Treenode = node;
 			// TODO Ensure that TreenodeViews are destroyed when the Treenodes are in existance but the containing TreeView isn't
@@ -27,12 +28,10 @@ namespace TreeViewer {
 		}
 
 		void Treenode_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-			if (PropertyChanged != null) {
-				switch (e.PropertyName) {
-					case "Flags":
-					case "FlagsExtended":
-					case "DataType": PropertyChanged(this, new PropertyChangedEventArgs("IconPath")); break;
-				}
+			switch (e.PropertyName) {
+				case "Flags":
+				case "FlagsExtended":
+				case "DataType": propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("IconPath")); break;
 			}
 		}
 
@@ -53,7 +52,7 @@ namespace TreeViewer {
 				string str = Treenode.DataAsString;
 				//int eol = str.IndexOf('\n');
 				//if (eol < 0) {
-					return str;
+				return str;
 				//} else {
 				//    return str.Substring(0, eol);
 				//}
@@ -68,9 +67,7 @@ namespace TreeViewer {
 			set {
 				if (value != isSelected) {
 					isSelected = value;
-					if (PropertyChanged != null) {
-						PropertyChanged(this, new PropertyChangedEventArgs("IsSelected"));
-					}
+					propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("IsSelected"));
 				}
 			}
 		}
@@ -83,9 +80,7 @@ namespace TreeViewer {
 			set {
 				if (value != isExpanded) {
 					isExpanded = value;
-					if (PropertyChanged != null) {
-						PropertyChanged(this, new PropertyChangedEventArgs("IsExpanded"));
-					}
+					propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("IsExpanded"));
 				}
 			}
 		}
@@ -111,11 +106,20 @@ namespace TreeViewer {
 				}
 			}
 		}
-		
+
 		#region INotifyPropertyChanged Members
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
+
+		FastSmartWeakEvent<PropertyChangedEventHandler> propertyChangedEvent = new FastSmartWeakEvent<PropertyChangedEventHandler>();
+
+		public event PropertyChangedEventHandler PropertyChanged {
+			add {
+				propertyChangedEvent.Add(value);
+			}
+			remove {
+				propertyChangedEvent.Remove(value);
+			}
+		}
+
 		#endregion
 	}
 }

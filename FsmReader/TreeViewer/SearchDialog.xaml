@@ -10,9 +10,6 @@
 		<local:FlagsExtendedToCheckedConverter x:Key="FlagsExtendedConverter"/>
 		<local:BoolInverterConverter x:Key="InverterConverter"/>
 	</Window.Resources>
-	<Window.CommandBindings>
-		<CommandBinding Command="Search" CanExecute="SearchCommandBinding_CanExecute" Executed="SearchCommandBinding_Executed"/>
-	</Window.CommandBindings>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
@@ -28,30 +25,30 @@
 			</Grid.ColumnDefinitions>
 			<GroupBox Header="Data Type">
 				<WrapPanel ItemWidth="70">
-					<CheckBox Margin="5,2" IsChecked="{Binding ElementName=Current, Path=FindAllDataTypes}">All</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
-							  IsChecked="{Binding ElementName=Current,  Path=DataType, ConverterParameter=Float, Converter={StaticResource DataTypeConverter}}">Float</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
-							  IsChecked="{Binding ElementName=Current,  Path=DataType, ConverterParameter=ByteBlock, Converter={StaticResource DataTypeConverter}}">String</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
-							  IsChecked="{Binding ElementName=Current,  Path=DataType, ConverterParameter=PointerCoupling, Converter={StaticResource DataTypeConverter}}">Coupling</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
-							  IsChecked="{Binding ElementName=Current,  Path=DataType, ConverterParameter=Object, Converter={StaticResource DataTypeConverter}}">Object</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
-							  IsChecked="{Binding ElementName=Current,  Path=DataType, ConverterParameter=None, Converter={StaticResource DataTypeConverter}}">None</CheckBox>
+					<CheckBox Margin="5,2" IsChecked="{Binding Path=FindAllDataTypes}">All</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
+							  IsChecked="{Binding  Path=DataType, ConverterParameter=Float, Converter={StaticResource DataTypeConverter}}">Float</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
+							  IsChecked="{Binding  Path=DataType, ConverterParameter=ByteBlock, Converter={StaticResource DataTypeConverter}}">String</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
+							  IsChecked="{Binding  Path=DataType, ConverterParameter=PointerCoupling, Converter={StaticResource DataTypeConverter}}">Coupling</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
+							  IsChecked="{Binding  Path=DataType, ConverterParameter=Object, Converter={StaticResource DataTypeConverter}}">Object</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
+							  IsChecked="{Binding  Path=DataType, ConverterParameter=None, Converter={StaticResource DataTypeConverter}}">None</CheckBox>
 				</WrapPanel>
 			</GroupBox>
 			<GroupBox Header="Flags" Margin="5,0" Grid.Column="1">
 				<WrapPanel ItemWidth="100">
-					<CheckBox Margin="5,2" IsChecked="{Binding ElementName=Current, Path=FindAllFlags}">All</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding ElementName=Current,  Path=Flags, ConverterParameter=CppFunc, Converter={StaticResource FlagConverter}}">C++</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding ElementName=Current,  Path=FlagsExtended, ConverterParameter=Flexscript, Converter={StaticResource FlagsExtendedConverter}}">Flexscript</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding ElementName=Current,  Path=FlagsExtended, ConverterParameter=DLLFunc, Converter={StaticResource FlagsExtendedConverter}}">DLL Function</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding ElementName=Current,  Path=FlagsExtended, ConverterParameter=GlobalCPPFunc, Converter={StaticResource FlagsExtendedConverter}}">Global C++</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding ElementName=Current,  Path=FlagsExtended, ConverterParameter=Hidden, Converter={StaticResource FlagsExtendedConverter}}">Hidden</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding ElementName=Current,  Path=FlagsExtended, ConverterParameter=Protected, Converter={StaticResource FlagsExtendedConverter}}">Protected</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding ElementName=Current,  Path=FlagsExtended, ConverterParameter=ODTDerivative, Converter={StaticResource FlagsExtendedConverter}}">ODT Derivative</CheckBox>
-					<CheckBox Margin="5,2" IsEnabled="{Binding ElementName=Current, Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding ElementName=Current,  Path=FlagsExtended, ConverterParameter=HideContent, Converter={StaticResource FlagsExtendedConverter}}">Hide Content</CheckBox>
+					<CheckBox Margin="5,2" IsChecked="{Binding Path=FindAllFlags}">All</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding  Path=Flags, ConverterParameter=CppFunc, Converter={StaticResource FlagConverter}}">C++</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding  Path=FlagsExtended, ConverterParameter=Flexscript, Converter={StaticResource FlagsExtendedConverter}}">Flexscript</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding  Path=FlagsExtended, ConverterParameter=DLLFunc, Converter={StaticResource FlagsExtendedConverter}}">DLL Function</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding  Path=FlagsExtended, ConverterParameter=GlobalCPPFunc, Converter={StaticResource FlagsExtendedConverter}}">Global C++</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding  Path=FlagsExtended, ConverterParameter=Hidden, Converter={StaticResource FlagsExtendedConverter}}">Hidden</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding  Path=FlagsExtended, ConverterParameter=Protected, Converter={StaticResource FlagsExtendedConverter}}">Protected</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding  Path=FlagsExtended, ConverterParameter=ODTDerivative, Converter={StaticResource FlagsExtendedConverter}}">ODT Derivative</CheckBox>
+					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllFlags, Converter={StaticResource InverterConverter}}"  IsChecked="{Binding  Path=FlagsExtended, ConverterParameter=HideContent, Converter={StaticResource FlagsExtendedConverter}}">Hide Content</CheckBox>
 				</WrapPanel>
 			</GroupBox>
 		</Grid>
@@ -61,7 +58,7 @@
 			<TextBlock Name="ResultPathText" Margin="5" Text="{Binding Result.FullPath}"/>
 		</StackPanel>
 		<StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Right">
-			<Button Command="Search" Height="25" Width="100" Margin="5">Find Next</Button>
+			<Button Command="{Binding Path=SearchCommand}" Height="25" Width="100" Margin="5">Find Next</Button>
 			<Button Height="25" Width="100" Margin="5">Close</Button>
 		</StackPanel>
 		<ScrollViewer Grid.Row="4">

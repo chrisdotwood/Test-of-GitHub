@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="FsmReader">
+</Property><Property Name="Solution File" Value="C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\FsmReader.sln">
+</Property><Property Name="Date" Value="12 May 2010">
+</Property><Property Name="Time" Value="15:16:34">
+</Property></Properties><Event ErrorLevel="0" Project="WeakEvents" Source="WeakEvents\WeakEvents.csproj" Description="Project file successfully backed up as C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Backup\WeakEvents.csproj">
+</Event><Event ErrorLevel="0" Project="WeakEvents" Source="WeakEvents\Properties\AssemblyInfo.cs" Description="File successfully backed up as C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Backup\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="WeakEvents" Source="WeakEvents\SmartWeakEvent\FastSmartWeakEvent.cs" Description="File successfully backed up as C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Backup\SmartWeakEvent\FastSmartWeakEvent.cs">
+</Event><Event ErrorLevel="0" Project="WeakEvents" Source="WeakEvents\SmartWeakEvent\SmartWeakEvent.cs" Description="File successfully backed up as C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Backup\SmartWeakEvent\SmartWeakEvent.cs">
+</Event><Event ErrorLevel="0" Project="WeakEvents" Source="WeakEvents\WeakEventHandler.cs" Description="File successfully backed up as C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Backup\WeakEventHandler.cs">
+</Event><Event ErrorLevel="0" Project="WeakEvents" Source="WeakEvents\WeakEventManagerBase.cs" Description="File successfully backed up as C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Backup\WeakEventManagerBase.cs">
+</Event><Event ErrorLevel="0" Project="WeakEvents" Source="WeakEvents\WeakReferenceToDelegate.cs" Description="File successfully backed up as C:\Documents and Settings\chris\My Documents\Visual Studio 2010\Projects\Test-of-GitHub\FsmReader\Backup\WeakReferenceToDelegate.cs">
+</Event><Event ErrorLevel="0" Project="WeakEvents" Source="WeakEvents\WeakEvents.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="WeakEvents" Source="WeakEvents\WeakEvents.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="WeakEvents" Source="WeakEvents\WeakEvents.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>
