@@ -17,14 +17,11 @@ using System.Timers;
 using System.Windows.Threading;
 
 namespace TreeViewer {
-	public class SearchViewModel : DependencyObject, INotifyPropertyChanged {
+	public class SearchViewModel : ViewModelBase {
 		private BackgroundWorker searchWorker;
 		private DepthFirstSearch searchDpt;
 		private Timer progressUpdateTimer = new Timer(1000);
 		private Func<Treenode, bool> predicate;
-
-		// TODO See if INotifyPropertyChanged can be removed
-		public event PropertyChangedEventHandler PropertyChanged;
 
 		public SearchViewModel(Treenode root) {
 			RootNode = root;
@@ -40,12 +37,18 @@ namespace TreeViewer {
 			progressUpdateTimer.Elapsed += new ElapsedEventHandler(ProgressUpdateTimer_Elapsed);
 
 			SearchCommand = new _SearchCommand(this);
+			CloseCommand = new _CloseCommand(this);
 
 			searchDpt = new DepthFirstSearch(root);
-			predicate = ((_SearchCommand) SearchCommand).SearchPredicate;
+			predicate = ((_SearchCommand)SearchCommand).SearchPredicate;
 		}
 
-		public ICommand                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        SearchCommand {
+		public ICommand SearchCommand {
+			get;
+			private set;
+		}
+
+		public ICommand CloseCommand {
 			get;
 			private set;
 		}
@@ -59,13 +62,12 @@ namespace TreeViewer {
 			}
 		}
 
-		private static void ResultChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args) {
-			Console.WriteLine();
-		}
-
 		#region Search Worker Event Handlers
 
 		private void SearchWorker_DoWork(object sender, DoWorkEventArgs e) {
+			// Update the state of the search button
+			SearchCommand.CanExecute(null);
+
 			progressUpdateTimer.Start();
 			e.Result = searchDpt.FindNode(predicate);
 		}
@@ -73,91 +75,78 @@ namespace TreeViewer {
 		private void searchWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
 			progressUpdateTimer.Stop();
 
-			this.Dispatcher.BeginInvoke(new Action(() => {
-				ProgressPercentage = (100 * searchDpt.VisitCount) / 1000000;
-				Result = e.Result as Treenode;
-			}), null);
+			ProgressPercentage = (100 * searchDpt.VisitCount) / 1000000;
+			Result = e.Result as Treenode;
 
 			// Update the state of the search button
-			CommandManager.InvalidateRequerySuggested();
+			SearchCommand.CanExecute(null);
 		}
 
 		private void SearchWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-			this.Dispatcher.BeginInvoke(new Action(() => {
-				ProgressPercentage = e.ProgressPercentage;
-			}), null);
+			ProgressPercentage = e.ProgressPercentage;
 		}
 
 		#endregion
 
-		#region Dependency Properties
+		#region Properties
 
+		private double progressPercentage;
 		public double ProgressPercentage {
-			get { return (double)GetValue(ProgressPercentageProperty); }
-			set { SetValue(ProgressPercentageProperty, value); }
+			get {
+				return progressPercentage;
+			}
+			set {
+				progressPercentage = value;
+				OnPropertyChanged("ProgressPercentage");
+			}
 		}
 
-		public static readonly DependencyProperty ProgressPercentageProperty =
-			DependencyProperty.Register("ProgressPercentage", typeof(double), typeof(SearchViewModel), new UIPropertyMetadata(0.0));
-
+		private Treenode result;
 		public Treenode Result {
-			get { return (Treenode)GetValue(ResultProperty); }
-			set { SetValue(ResultProperty, value); }
+			get {
+				return result;
+			}
+			set {
+				result = value;
+				OnPropertyChanged("Result");
+				CommandManager.InvalidateRequerySuggested();
+			}
 		}
-
-		public static readonly DependencyProperty ResultProperty =
-			DependencyProperty.Register("Result", typeof(Treenode), typeof(SearchViewModel), new UIPropertyMetadata() {
-				DefaultValue = null,
-				PropertyChangedCallback = new PropertyChangedCallback(ResultChanged)
-			});
 
 		public Treenode RootNode {
-			get { return (Treenode)GetValue(RootNodeProperty); }
-			set { SetValue(RootNodeProperty, value); }
+			get;
+			set;
 		}
-
-		public static readonly DependencyProperty RootNodeProperty =
-			DependencyProperty.Register("RootNode", typeof(Treenode), typeof(SearchDialog), new UIPropertyMetadata(null));
-
 		public DataType DataType {
-			get { return (DataType)GetValue(DataTypeProperty); }
-			set { SetValue(DataTypeProperty, value); }
+			get;
+			set;
 		}
-
-		public static readonly DependencyProperty DataTypeProperty =
-			DependencyProperty.Register("DataType", typeof(DataType), typeof(SearchDialog), new UIPropertyMetadata(DataType.None));
 
 		public Flags Flags {
-			get { return (Flags)GetValue(FlagsProperty); }
-			set { SetValue(FlagsProperty, value); }
+			get;
+			set;
 		}
-
-		public static readonly DependencyProperty FlagsProperty =
-			DependencyProperty.Register("Flags", typeof(Flags), typeof(SearchDialog), new UIPropertyMetadata(Flags.None));
 
 		public FlagsExtended FlagsExtended {
-			get { return (FlagsExtended)GetValue(FlagsExtendedProperty); }
-			set { SetValue(FlagsExtendedProperty, value); }
+			get;
+			set;
 		}
 
-		public static readonly DependencyProperty FlagsExtendedProperty =
-			DependencyProperty.Register("FlagsExtended", typeof(FlagsExtended), typeof(SearchDialog), new UIPropertyMetadata(FlagsExtended.None));
-
+		private bool findAllDataTypes = true;
 		public bool FindAllDataTypes {
-			get { return (bool)GetValue(FindAllDataTypesProperty); }
-			set { SetValue(FindAllDataTypesProperty, value); }
+			get {
+				return findAllDataTypes;
+			}
+			set {
+				findAllDataTypes = value;
+				OnPropertyChanged("FindAllDataTypes");
+			}
 		}
-
-		public static readonly DependencyProperty FindAllDataTypesProperty =
-			DependencyProperty.Register("FindAllDataTypes", typeof(bool), typeof(SearchDialog), new UIPropertyMetadata(true));
 
 		public bool FindAllFlags {
-			get { return (bool)GetValue(FindAllFlagsProperty); }
-			set { SetValue(FindAllFlagsProperty, value); }
+			get;
+			set;
 		}
-
-		public static readonly DependencyProperty FindAllFlagsProperty =
-			DependencyProperty.Register("FindAllFlags", typeof(bool), typeof(SearchDialog), new UIPropertyMetadata(true));
 
 		#endregion
 
@@ -172,34 +161,24 @@ namespace TreeViewer {
 				svm = parent;
 			}
 
-
-			// These are copies of the state of the dependency properties at the time
-			// the search was started. This is to prevent them from being accessed
-			// from the wrong thread.
-			private bool currentFindAllDataTypes;
-			private bool currentFindAllFlags;
-			private DataType currentDataType;
-			private Flags currentFlags;
-			private FlagsExtended currentFlagsExtended;
-
 			public bool CanExecute(object parameter) {
 				bool canExecute = !svm.searchWorker.IsBusy && svm.RootNode != null;
 
 				if (canExecute != lastCanExecute) {
 					lastCanExecute = canExecute;
 					if (CanExecuteChanged != null) {
-						CanExecuteChanged(this, null);
+						svm.UIAction(() => CanExecuteChanged(this, new EventArgs()));
 					}
 				}
 				return canExecute;
 			}
 
 			public void Execute(object parameter) {
-				currentFindAllFlags = svm.FindAllFlags;
-				currentFindAllDataTypes = svm.FindAllDataTypes;
-				currentDataType = svm.DataType;
-				currentFlags = svm.Flags;
-				currentFlagsExtended = svm.FlagsExtended;
+				svm.FindAllFlags = svm.FindAllFlags;
+				svm.FindAllDataTypes = svm.FindAllDataTypes;
+				svm.DataType = svm.DataType;
+				svm.Flags = svm.Flags;
+				svm.FlagsExtended = svm.FlagsExtended;
 
 				svm.searchWorker.RunWorkerAsync();
 			}
@@ -210,11 +189,11 @@ namespace TreeViewer {
 			/// <param name="node">The Treenode that is currently being evaluated.</param>
 			/// <returns>True if the Treenode matches the criteria specified on this form, false otherwise.</returns>
 			public bool SearchPredicate(Treenode node) {
-				if (!currentFindAllDataTypes && node.DataType != currentDataType) return false;
+				if (!svm.FindAllDataTypes && node.DataType != svm.DataType) return false;
 
-				if (!currentFindAllFlags) {
-					if ((node.Flags & currentFlags) != currentFlags) return false;
-					if ((node.FlagsExtended & currentFlagsExtended) != currentFlagsExtended) return false;
+				if (!svm.FindAllFlags) {
+					if ((node.Flags & svm.Flags) != svm.Flags) return false;
+					if ((node.FlagsExtended & svm.FlagsExtended) != svm.FlagsExtended) return false;
 				}
 				return true;
 			}

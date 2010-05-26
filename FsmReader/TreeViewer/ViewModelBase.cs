@@ -14,6 +14,8 @@ namespace TreeViewer {
 			set;
 		}
 
+		public Action<Action> UIAction = ((uiaction) => uiaction());
+
 		protected virtual void OnPropertyChanged(string propertyName) {
 			this.VerifyPropertyName(propertyName);
 

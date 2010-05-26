@@ -25,7 +25,7 @@
 			</Grid.ColumnDefinitions>
 			<GroupBox Header="Data Type">
 				<WrapPanel ItemWidth="70">
-					<CheckBox Margin="5,2" IsChecked="{Binding Path=FindAllDataTypes}">All</CheckBox>
+					<CheckBox Margin="5,2" IsChecked="{Binding Path=FindAllDataTypes, Mode=TwoWay}">All</CheckBox>
 					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
 							  IsChecked="{Binding  Path=DataType, ConverterParameter=Float, Converter={StaticResource DataTypeConverter}}">Float</CheckBox>
 					<CheckBox Margin="5,2" IsEnabled="{Binding Path=FindAllDataTypes, Converter={StaticResource InverterConverter}}" 
@@ -52,14 +52,14 @@
 				</WrapPanel>
 			</GroupBox>
 		</Grid>
-		<ProgressBar Name="ProgressBar" Grid.Row="1" Margin="5" Height="20" Value="{Binding ProgressPercentage}"/>
+		<ProgressBar Name="ProgressBar" Grid.Row="1" Margin="5" Height="20" Value="{Binding ProgressPercentage}" />
 		<StackPanel Orientation="Horizontal" Grid.Row="2">
 			<TextBlock Margin="5">Found Node:</TextBlock>
 			<TextBlock Name="ResultPathText" Margin="5" Text="{Binding Result.FullPath}"/>
 		</StackPanel>
 		<StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Right">
 			<Button Command="{Binding Path=SearchCommand}" Height="25" Width="100" Margin="5">Find Next</Button>
-			<Button Height="25" Width="100" Margin="5">Close</Button>
+			<Button Command="{Binding Path=CloseCommand}" Height="25" Width="100" Margin="5">Close</Button>
 		</StackPanel>
 		<ScrollViewer Grid.Row="4">
 			<TextBlock Name="nodeContent" Text="{Binding Result.DataAsString}" TextWrapping="Wrap"/>

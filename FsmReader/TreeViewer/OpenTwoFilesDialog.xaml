@@ -7,7 +7,7 @@
 			 x:Name="OpenTwoFiles"
 			 Title="Select Two Files..."
 			
-             Width="580" SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False">
+             Width="580" SizeToContent="Height" ResizeMode="NoResize">
     <Grid Height="Auto">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>

@@ -20,11 +20,14 @@ namespace TreeViewer {
 		public SearchDialog() {
 			InitializeComponent();
 		}
-		
+
 		public SearchDialog(Treenode root) {
 			InitializeComponent();
 
-			this.DataContext = new SearchViewModel(root);
+			SearchViewModel svm = new SearchViewModel(root);
+			svm.UIAction = ((uiaction) => Dispatcher.BeginInvoke(uiaction));
+
+			this.DataContext = svm;
 		}
 	}
 }
