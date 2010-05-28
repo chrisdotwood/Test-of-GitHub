@@ -8,5 +8,8 @@
     <Setting Name="LastRightDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="MergeToolPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Program Files\WinMerge\WinMergeU.exe</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

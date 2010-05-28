@@ -46,5 +46,17 @@ namespace TreeViewer.Properties {
                 this["LastRightDirectory"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files\\WinMerge\\WinMergeU.exe")]
+        public string MergeToolPath {
+            get {
+                return ((string)(this["MergeToolPath"]));
+            }
+            set {
+                this["MergeToolPath"] = value;
+            }
+        }
     }
 }

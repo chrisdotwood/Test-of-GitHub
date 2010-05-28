@@ -18,6 +18,7 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using Diff;
 using Microsoft.Win32;
 using ICSharpCode.AvalonEdit;
+using System.Diagnostics;
 
 namespace TreeViewer {
 	/// <summary>
@@ -275,5 +276,77 @@ namespace TreeViewer {
 
 		#endregion
 
+		private void MergeTool_Click(object sender, RoutedEventArgs e) {
+			string mergeToolPath = TreeViewer.Properties.Settings.Default.MergeToolPath;
+
+			if (!System.IO.File.Exists(mergeToolPath)) {
+				MessageBox.Show("The merge tool is not configured", "Merge Tool", MessageBoxButton.OK, MessageBoxImage.Information);
+				return;
+			}
+
+			// Write each of the code windows to a temporary file
+			string leftTempPath = System.IO.Path.GetTempFileName() + ".cpp";
+			string rightTempPath = System.IO.Path.GetTempFileName() + ".cpp";
+
+			try {
+				using (FileStream fs = new FileStream(leftTempPath, FileMode.OpenOrCreate)) {
+					StreamWriter sw = new StreamWriter(fs);
+					sw.Write(LeftCodeText.Text);
+				}
+				using (FileStream fs = new FileStream(rightTempPath, FileMode.OpenOrCreate)) {
+					StreamWriter sw = new StreamWriter(fs);
+					sw.Write(RightCodeText.Text);
+				}
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				MessageBox.Show("Unable to write to temporary files: " + ex.Message, "Merge Tool", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
+
+			// Start the merge tool
+			try {
+				Process proc = new Process();
+
+				proc.StartInfo.FileName = mergeToolPath;
+				proc.StartInfo.Arguments = "\"" + leftTempPath + "\" " + "\"" + rightTempPath + "\"";
+				proc.EnableRaisingEvents = true;
+				proc.Exited += new EventHandler(MergeTool_Exited);
+				
+				proc.Start();
+
+				MergeToolState state = new MergeToolState() {
+					LeftPath = leftTempPath,
+					RightPath = rightTempPath,
+					LeftTreenode = LeftFsmTree.SelectedItem.Treenode,
+					RightTreenode = RightFsmTree.SelectedItem.Treenode
+				};
+				mergeToolEdits.Add(proc.Id, state);
+
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				MessageBox.Show("Unable to open merge tool: " + ex.Message, "Merge Tool", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
+		}
+
+		Dictionary<int, MergeToolState> mergeToolEdits = new Dictionary<int, MergeToolState>();
+
+		class MergeToolState {
+			public string LeftPath;
+			public string RightPath;
+
+			public Treenode LeftTreenode;
+			public Treenode RightTreenode;
+		}
+		
+
+		private void MergeTool_Exited(object sender, EventArgs e) {
+			Process proc = (Process) sender;
+
+			if (mergeToolEdits.ContainsKey(proc.Id)) {
+				MergeToolState state = mergeToolEdits[proc.Id];
+
+			}
+		}
 	}
 }

@@ -37,18 +37,12 @@ namespace TreeViewer {
 			progressUpdateTimer.Elapsed += new ElapsedEventHandler(ProgressUpdateTimer_Elapsed);
 
 			SearchCommand = new _SearchCommand(this);
-			CloseCommand = new _CloseCommand(this);
 
 			searchDpt = new DepthFirstSearch(root);
 			predicate = ((_SearchCommand)SearchCommand).SearchPredicate;
 		}
 
 		public ICommand SearchCommand {
-			get;
-			private set;
-		}
-
-		public ICommand CloseCommand {
 			get;
 			private set;
 		}

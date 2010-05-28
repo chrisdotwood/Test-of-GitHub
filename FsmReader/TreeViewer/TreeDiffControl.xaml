@@ -28,6 +28,7 @@
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="30" />
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
 			<Grid>
@@ -38,7 +39,7 @@
 				<local:FsmTreeView x:Name="LeftFsmTree" Margin="5" SelectedItemChanged="LeftFsmTree_SelectedItemChanged" />
 				<local:TreenodeFlagControl Margin="5,0,5,5"  Grid.Row="1" x:Name="LeftFlags" />
 			</Grid>
-			<Grid Grid.Column="1">
+			<Grid Grid.Column="2">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="*"/>
 					<RowDefinition Height="Auto"/>
@@ -54,13 +55,16 @@
 				<avalon:TextEditor DockPanel.Dock="Right" TextChanged="LeftCodeText_TextChanged" Margin="5" Name="LeftCodeText" FontFamily="Consolas"/>
 			</DockPanel>
 			<GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="2" Grid.ColumnSpan="2"/>
-			<DockPanel Grid.Row="2" Grid.Column="1">
+			<DockPanel Grid.Row="2" Grid.Column="2">
 				<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Name="RightTreePath" Background="LightGray"/>
 				<StatusBar DockPanel.Dock="Bottom">
 					<TextBlock Name="RightStatusText"/>
 				</StatusBar>
 				<avalon:TextEditor DockPanel.Dock="Bottom" TextChanged="RightCodeText_TextChanged" Margin="5" Name="RightCodeText" FontFamily="Consolas"/>
 			</DockPanel>
+			<StackPanel Grid.Row="1" Grid.Column="1">
+				<Button Margin="3" ToolTip="Open in Merge Tool" Click="MergeTool_Click">M</Button>
+			</StackPanel>
 		</Grid>
 	</DockPanel>
 </UserControl>
