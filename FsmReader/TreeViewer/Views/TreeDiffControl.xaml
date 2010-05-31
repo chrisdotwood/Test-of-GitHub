@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="TreeViewer.TreeDiffControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:TreeViewer"
+			 xmlns:avalon="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+             mc:Ignorable="d" 
+			 Loaded="UserControl_Loaded"
+			 x:Name="MainUserControl"
+             d:DesignHeight="643" d:DesignWidth="1079">
+	<UserControl.CommandBindings>
+	</UserControl.CommandBindings>
+	<DockPanel>
+		<ToolBar DockPanel.Dock="Top">
+			<Button Margin="3" Command="{Binding OpenCommand}">Open</Button>
+			<Button Margin="3" Command="{Binding SaveCommand}">Save</Button>
+			<Button Margin="3" Command="{Binding SearchCommand}">Search</Button>
+		</ToolBar>
+
+		<Grid DockPanel.Dock="Bottom">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="30" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<local:FsmTreeView DataContext="{Binding LeftFsmTree}" Margin="5" />
+				<local:TreenodeFlagControl Margin="5,0,5,5"  Grid.Row="1" x:Name="LeftFlags" />
+			</Grid>
+			<Grid Grid.Column="2">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<local:FsmTreeView DataContext="{Binding RightFsmTree}" Margin="5"  />
+				<local:TreenodeFlagControl Margin="5,0,5,5" Grid.Row="1" x:Name="RightFlags" />
+			</Grid>
+			<DockPanel Grid.Row="2" Grid.Column="0">
+				<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Text="{Binding LeftFsmTree.SelectedItem.FullPath}" Background="LightGray"/>
+				<StatusBar DockPanel.Dock="Bottom">
+					<TextBlock Text="{Binding LeftFilePath}"/>
+				</StatusBar>
+				<avalon:TextEditor DockPanel.Dock="Right" Margin="5" Document="{Binding LeftFsmTree.SelectedItem.DataAsString}" Name="LeftCodeText" FontFamily="Consolas"/>
+			</DockPanel>
+			<GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="2" Grid.ColumnSpan="2"/>
+			<DockPanel Grid.Row="2" Grid.Column="2">
+				<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Text="{Binding RightFsmTree.SelectedItem.FullPath}" Background="LightGray"/>
+				<StatusBar DockPanel.Dock="Bottom">
+					<TextBlock Text="{Binding RightFilePath}"/>
+				</StatusBar>
+				<avalon:TextEditor DockPanel.Dock="Bottom" Margin="5" Document="{Binding RightFsmTree.SelectedItem.DataAsString}" Name="RightCodeText" FontFamily="Consolas"/>
+			</DockPanel>
+			<StackPanel Grid.Row="1" Grid.Column="1">
+				<Button Margin="3" ToolTip="Open in Merge Tool" Command="{Binding MergeToolCommand}">M</Button>
+			</StackPanel>
+		</Grid>
+	</DockPanel>
+</UserControl>
