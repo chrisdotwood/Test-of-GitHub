@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows;
 
 namespace TreeViewer {
-	public class ViewModelBase : INotifyPropertyChanged, IDisposable {
+	public class ViewModelBase : DependencyObject, INotifyPropertyChanged, IDisposable {
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		public string DisplayName {

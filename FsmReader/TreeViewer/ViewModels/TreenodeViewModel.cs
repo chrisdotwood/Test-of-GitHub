@@ -6,25 +6,29 @@ using System.Linq;
 using SmartWeakEvent;
 
 namespace TreeViewer {
-	public class TreenodeView : INotifyPropertyChanged {
-		private ObservableCollection<TreenodeView> children = new ObservableCollection<TreenodeView>();
+	public class TreenodeViewModel : INotifyPropertyChanged {
+		private ObservableCollection<TreenodeViewModel> children = new ObservableCollection<TreenodeViewModel>();
 		private Treenode Treenode { get; set; }
-		public TreenodeView Parent { get; set; }
+		public TreenodeViewModel Parent { get; set; }
 
-		public TreenodeView(Treenode node, TreenodeView parent) {
+		public TreenodeViewModel(Treenode node, TreenodeViewModel parent) {
 			this.Treenode = node;
 			// TODO Ensure that TreenodeViews are destroyed when the Treenodes are in existance but the containing TreeView isn't
 			this.Treenode.PropertyChanged += new PropertyChangedEventHandler(Treenode_PropertyChanged);
 			this.Parent = parent;
 			foreach (Treenode n in Treenode.Children.Cast<Treenode>()) {
-				children.Add(new TreenodeView(n, this));
+				children.Add(new TreenodeViewModel(n, this));
 			}
 		}
 
-		~TreenodeView() {
+		~TreenodeViewModel() {
 			if (this.Treenode != null) {
 				this.Treenode.PropertyChanged -= Treenode_PropertyChanged;
 			}
+		}
+
+		public static Treenode GetTreenode(TreenodeViewModel vm) {
+			return vm.Treenode;
 		}
 
 		void Treenode_PropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -38,9 +42,15 @@ namespace TreeViewer {
 			}
 		}
 
-		public ObservableCollection<TreenodeView> Children {
+		public ObservableCollection<TreenodeViewModel> Children {
 			get {
 				return children;
+			}
+		}
+
+		public TreenodeViewModel this[int x] {
+			get {
+				return Children[x];
 			}
 		}
 
@@ -116,20 +126,20 @@ namespace TreeViewer {
 		public string IconPath {
 			get {
 				if (Treenode.DataType == DataType.Object) {
-					return "Images/Object.png";
+					return "/Images/Object.png";
 				} else if ((Treenode.Flags & Flags.CppFunc) == Flags.CppFunc) {
-					return "Images/CPP.png";
+					return "/Images/CPP.png";
 				} else if ((Treenode.FlagsExtended & FlagsExtended.DLLFunc) == FlagsExtended.DLLFunc) {
-					return "Images/DLL.png";
+					return "/Images/DLL.png";
 				} else if ((Treenode.FlagsExtended & FlagsExtended.GlobalCPPFunc) == FlagsExtended.GlobalCPPFunc) {
-					return "Images/GlobalCPP.png";
+					return "/Images/GlobalCPP.png";
 				} else if ((Treenode.FlagsExtended & FlagsExtended.Flexscript) == FlagsExtended.Flexscript) {
-					return "Images/Flexscript.png";
+					return "/Images/Flexscript.png";
 				} else {
 					if (Treenode.NodeChildren.Count > 0) {
-						return "Images/Folder.png";
+						return "/Images/Folder.png";
 					} else {
-						return "Images/Default.png";
+						return "/Images/Default.png";
 					}
 				}
 			}
@@ -169,7 +179,7 @@ namespace TreeViewer {
 			return Treenode == node;
 		}
 
-		internal static void Write(TreenodeView SelectedItem, System.IO.FileStream fs) {
+		internal static void Write(TreenodeViewModel SelectedItem, System.IO.FileStream fs) {
 			Treenode.Write(SelectedItem.Treenode, fs);
 		}
 	}

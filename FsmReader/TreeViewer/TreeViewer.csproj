@@ -90,7 +90,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="FsmTreeView.xaml">
+    <Page Include="Views\FsmTreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <Generator>MSBuild:Compile</Generator>
@@ -104,11 +104,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TreeCodeBrowser.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="TreeDiffControl.xaml">
+    <Page Include="Views\TreeDiffControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -130,15 +126,14 @@
     <Compile Include="OpenTwoFilesDialog.xaml.cs">
       <DependentUpon>OpenTwoFilesDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\TreeCodeBrowserViewModel.cs" />
+    <Compile Include="RerlayCommand.cs" />
+    <Compile Include="ViewModels\FsmTreeViewModel.cs" />
+    <Compile Include="ViewModels\TreeDiffControlViewModel.cs" />
     <Compile Include="Views\SearchView.xaml.cs">
       <DependentUpon>SearchView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\SearchViewModel.cs" />
-    <Compile Include="TreeCodeBrowser.xaml.cs">
-      <DependentUpon>TreeCodeBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="TreeDiffControl.xaml.cs">
+    <Compile Include="Views\TreeDiffControl.xaml.cs">
       <DependentUpon>TreeDiffControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="TreenodeFlagControl.xaml.cs">
@@ -152,7 +147,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FsmTreeView.xaml.cs">
+    <Compile Include="Views\FsmTreeView.xaml.cs">
       <DependentUpon>FsmTreeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">

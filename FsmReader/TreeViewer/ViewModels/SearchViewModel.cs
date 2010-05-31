@@ -23,7 +23,7 @@ namespace TreeViewer {
 		private Timer progressUpdateTimer = new Timer(1000);
 		private Func<Treenode, bool> predicate;
 
-		public SearchViewModel(Treenode root) {
+		public SearchViewModel(TreenodeViewModel root) {
 			RootNode = root;
 
 			searchWorker = new BackgroundWorker() {
@@ -38,7 +38,7 @@ namespace TreeViewer {
 
 			SearchCommand = new _SearchCommand(this);
 
-			searchDpt = new DepthFirstSearch(root);
+			searchDpt = new DepthFirstSearch(TreenodeViewModel.GetTreenode(root));
 			predicate = ((_SearchCommand)SearchCommand).SearchPredicate;
 		}
 
@@ -107,7 +107,7 @@ namespace TreeViewer {
 			}
 		}
 
-		public Treenode RootNode {
+		public TreenodeViewModel RootNode {
 			get;
 			set;
 		}

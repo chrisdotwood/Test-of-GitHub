@@ -21,7 +21,7 @@ namespace TreeViewer {
 			InitializeComponent();
 		}
 
-		public SearchView(Treenode root) {
+		public SearchView(TreenodeViewModel root) {
 			InitializeComponent();
 
 			SearchViewModel svm = new SearchViewModel(root);
