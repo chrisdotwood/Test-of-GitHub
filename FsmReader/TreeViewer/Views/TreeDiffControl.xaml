@@ -49,7 +49,7 @@
 				<StatusBar DockPanel.Dock="Bottom">
 					<TextBlock Text="{Binding LeftFilePath}"/>
 				</StatusBar>
-				<avalon:TextEditor DockPanel.Dock="Right" Margin="5" Document="{Binding LeftFsmTree.SelectedItem.DataAsString}" Name="LeftCodeText" FontFamily="Consolas"/>
+				<avalon:TextEditor DockPanel.Dock="Right" Margin="5" Document="{Binding LeftFsmTree.SelectedItem.DataAsString, NotifyOnSourceUpdated=True, Mode=TwoWay}" Name="LeftCodeText" FontFamily="Consolas"/>
 			</DockPanel>
 			<GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="2" Grid.ColumnSpan="2"/>
 			<DockPanel Grid.Row="2" Grid.Column="2">
@@ -57,8 +57,9 @@
 				<StatusBar DockPanel.Dock="Bottom">
 					<TextBlock Text="{Binding RightFilePath}"/>
 				</StatusBar>
-				<avalon:TextEditor DockPanel.Dock="Bottom" Margin="5" Document="{Binding RightFsmTree.SelectedItem.DataAsString}" Name="RightCodeText" FontFamily="Consolas"/>
-			</DockPanel>
+                <!--avalon:TextEditor DockPanel.Dock="Bottom" Margin="5" Document="{Binding RightFsmTree.SelectedItem.DataAsString}" Name="RightCodeText" FontFamily="Consolas"/-->
+                <TextBox DockPanel.Dock="Bottom" Margin="5" Text="{Binding RightFsmTree.SelectedItem.DataAsString, TargetNullValue='asdasd asdasd'}" />
+            </DockPanel>
 			<StackPanel Grid.Row="1" Grid.Column="1">
 				<Button Margin="3" ToolTip="Open in Merge Tool" Command="{Binding MergeToolCommand}">M</Button>
 			</StackPanel>

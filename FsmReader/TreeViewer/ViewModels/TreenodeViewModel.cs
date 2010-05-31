@@ -6,7 +6,7 @@ using System.Linq;
 using SmartWeakEvent;
 
 namespace TreeViewer {
-	public class TreenodeViewModel : INotifyPropertyChanged {
+	public class TreenodeViewModel : ViewModelBase {
 		private ObservableCollection<TreenodeViewModel> children = new ObservableCollection<TreenodeViewModel>();
 		private Treenode Treenode { get; set; }
 		public TreenodeViewModel Parent { get; set; }
@@ -48,12 +48,6 @@ namespace TreeViewer {
 			}
 		}
 
-		public TreenodeViewModel this[int x] {
-			get {
-				return Children[x];
-			}
-		}
-
 		public string Title {
 			get {
 				return Treenode.Title;
@@ -69,6 +63,7 @@ namespace TreeViewer {
 			}
 			set {
 				Treenode.DataAsString = value;
+					propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("DataAsString"));
 			}
 		}
 

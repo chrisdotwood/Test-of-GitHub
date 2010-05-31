@@ -30,7 +30,7 @@ namespace TreeViewer {
 			InitializeComponent();
 
 			LeftCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
-			RightCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
+			//RightCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
 
 			TreeDiffControlViewModel vm = new TreeDiffControlViewModel();
 			vm.UIAction = (s) => this.Dispatcher.BeginInvoke(s, null);

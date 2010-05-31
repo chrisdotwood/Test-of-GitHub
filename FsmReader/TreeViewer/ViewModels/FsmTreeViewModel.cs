@@ -18,14 +18,14 @@ namespace TreeViewer.ViewModels {
 
 		public TreenodeViewModel SelectedItem {
 			get { return (TreenodeViewModel)GetValue(SelectedItemProperty); }
-			private set { SetValue(SelectedItemProperty, value); }
+			set { SetValue(SelectedItemProperty, value); }
 		}
 
 		public static readonly DependencyProperty SelectedItemProperty =
-			DependencyProperty.Register("SelectedItem", typeof(TreenodeViewModel), typeof(FsmTreeView),
+			DependencyProperty.Register("SelectedItem", typeof(TreenodeViewModel), typeof(FsmTreeViewModel),
 			new UIPropertyMetadata() {
 				DefaultValue = null,
-				//PropertyChangedCallback = new PropertyChangedCallback(SelectedItemPropertyChanged)
+				PropertyChangedCallback = new PropertyChangedCallback(SelectedItemPropertyChanged)
 			});
 
 		public ICommand SaveAsCommand {
@@ -33,10 +33,11 @@ namespace TreeViewer.ViewModels {
 			private set;
 		}
 
-		//private static void SelectedItemPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args) {
-		//    FsmTreeView tv = (FsmTreeView)sender;
-		//    tv.RaiseEvent(new RoutedEventArgs(FsmTreeView.SelectedItemChangedEvent));
-		//}
+		private static void SelectedItemPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args) {
+			Console.WriteLine();
+			//FsmTreeView tv = (FsmTreeView)sender;
+			//tv.RaiseEvent(new RoutedEventArgs(FsmTreeView.SelectedItemChangedEvent));
+		}
 
 		//public static readonly RoutedEvent SelectedItemChangedEvent = EventManager.RegisterRoutedEvent(
 		//    "SelectedItemChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(FsmTreeView));
@@ -109,7 +110,7 @@ namespace TreeViewer.ViewModels {
 		//    }
 		//}
 
-	
+
 		#region Command Bindings
 
 		private void SaveAsCommandBinding_Executed(object sender) {

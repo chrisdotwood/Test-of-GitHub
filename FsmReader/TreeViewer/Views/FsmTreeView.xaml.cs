@@ -24,22 +24,19 @@ namespace TreeViewer {
 	/// Interaction logic for FsmTreeView.xaml
 	/// </summary>
 	public partial class FsmTreeView : UserControl {
+		FsmTreeViewModel vm;
+
 		public FsmTreeView() {
 			InitializeComponent();
-			FsmTreeViewModel vm = new FsmTreeViewModel();
+			
+			vm = new FsmTreeViewModel();
 			vm.UIAction = (s) => this.Dispatcher.BeginInvoke(s, null);
 
 			this.DataContext = vm;
 		}
 
 		private void tree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {
-			//throw new NotImplementedException();
-
-			//if (Tree.SelectedItem == null) {
-			//    SelectedItem = null;
-			//} else {
-			//    SelectedItem = Tree.SelectedItem as TreenodeView;
-			//}
+			vm.SelectedItem = (TreenodeViewModel)e.NewValue;
 		}
 
 	
