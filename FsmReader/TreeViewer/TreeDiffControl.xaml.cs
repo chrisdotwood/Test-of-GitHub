@@ -71,12 +71,20 @@ namespace TreeViewer {
 				}
 			}), null);
 
-			using (FileStream stream = new FileStream(arg.Path, FileMode.Open)) {
-				e.Result = Treenode.Read(stream);
+			try {
+				using (FileStream stream = new FileStream(arg.Path, FileMode.Open)) {
+					e.Result = Treenode.Read(stream);
+				}
+
+				this.Dispatcher.BeginInvoke(new Action(() => {
+					arg.Target.DataContext = e.Result;
+				}), null);
+			} catch (Exception ex) {
+				this.Dispatcher.BeginInvoke(new Action(() => {
+					MessageBox.Show("Error loading file " + arg.Path + ": " + ex.Message, "Error Loading File", MessageBoxButton.OK, MessageBoxImage.Error);
+				}), null);
+			
 			}
-			this.Dispatcher.BeginInvoke(new Action(() => {
-				arg.Target.DataContext = e.Result;
-			}), null);
 		}
 
 		void loadFileWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -289,13 +297,13 @@ namespace TreeViewer {
 			string rightTempPath = System.IO.Path.GetTempFileName() + ".cpp";
 
 			try {
-				using (FileStream fs = new FileStream(leftTempPath, FileMode.OpenOrCreate)) {
-					StreamWriter sw = new StreamWriter(fs);
+				using (StreamWriter sw = new StreamWriter(new FileStream(leftTempPath, FileMode.OpenOrCreate))) {
 					sw.Write(LeftCodeText.Text);
+					sw.Close();
 				}
-				using (FileStream fs = new FileStream(rightTempPath, FileMode.OpenOrCreate)) {
-					StreamWriter sw = new StreamWriter(fs);
+				using (StreamWriter sw = new StreamWriter(new FileStream(rightTempPath, FileMode.OpenOrCreate))) {
 					sw.Write(RightCodeText.Text);
+					sw.Close();
 				}
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
@@ -345,7 +353,26 @@ namespace TreeViewer {
 
 			if (mergeToolEdits.ContainsKey(proc.Id)) {
 				MergeToolState state = mergeToolEdits[proc.Id];
-
+				
+				// Check to see if the text has been changed, if so replace it in the tree
+				try {
+					string leftEdited = ReadTextFile(state.LeftPath);
+					if (leftEdited != state.LeftTreenode.DataAsString) {
+						state.LeftTreenode.Data = leftEdited;
+					}
+					string rightEdited = ReadTextFile(state.RightPath);
+					if (rightEdited != state.RightTreenode.DataAsString) {
+						state.RightTreenode.Data = rightEdited;
+					}
+				} catch (Exception ex) {
+					MessageBox.Show("An error has occurred when loading the changes: " + ex.Message, "Merge Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				}
+			}
+		}
+		// TODO Investigate bug whereby the whole file is not returned.
+		private string ReadTextFile(string path) {
+			using (StreamReader sr = new StreamReader(new FileStream(path, FileMode.Open))) {
+				return sr.ReadToEnd();
 			}
 		}
 	}

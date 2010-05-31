@@ -24,6 +24,11 @@ namespace TreeViewer {
 			set { SetValue(RootNodeProperty, value); }
 		}
 
+		public Treenode CurrentNode {
+			get;
+			set;
+		}
+
 		// Using a DependencyProperty as the backing store for RootNode.  This enables animation, styling, binding, etc...
 		public static readonly DependencyProperty RootNodeProperty =
 			DependencyProperty.Register("RootNode", typeof(Treenode), typeof(TreeCodeBrowser),
@@ -48,13 +53,11 @@ namespace TreeViewer {
 			TreenodeView node = ((FsmTreeView)sender).SelectedItem;
 			
 			if (node == null) {
-				CodeText.Text = "";
 				TreePath.Text = "No Node Selected";
-
+				CurrentNode = null;
 			} else {
-				CodeText.Text = node.Treenode.DataAsString;
 				TreePath.Text = node.Treenode.FullPath;
-
+				CurrentNode = node.Treenode;
 				//select lines 3 to 5
 				//if (Tree.Document.LineCount > 5) {
 				//    int start = Tree.Document.GetLineByNumber(3).Offset;
@@ -62,6 +65,10 @@ namespace TreeViewer {
 				//    Tree.Select(start, end - start);
 				//}
 			}
+		}
+
+		private void CodeText_TextChanged(object sender, EventArgs e) {
+			CurrentNode.Data = CodeText.Text;
 		}
 	}
 }

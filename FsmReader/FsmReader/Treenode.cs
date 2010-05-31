@@ -179,7 +179,12 @@ namespace FsmReader {
 				return data;
 			}
 			set {
-				data = value;
+				if (value != data) {
+					data = value;
+					FirePropertyChanged("Data");
+					FirePropertyChanged("DataAsString");
+					FirePropertyChanged("DataAsDouble");
+				}
 			}
 		}
 
@@ -279,28 +284,37 @@ namespace FsmReader {
 
 			SortedList<int, Treenode> nodeArray = new SortedList<int, Treenode>();
 			// Load the tree
-			Treenode root = _Read(stream, ref count, couplings, nodeArray);
+			try {
+				Treenode root = _Read(stream, ref count, couplings, nodeArray);
 
-			Console.WriteLine("Read " + count + " nodes");
+				Console.WriteLine("Read " + count + " nodes");
 
-			// Connect the couplings
-			// May need to check bi-directionality of these
-			//foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
-			//    Treenode target = nodeArray[kv.Key];
+				// Connect the couplings
+				// May need to check bi-directionality of these
+				foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
+					Treenode target = nodeArray[kv.Key];
 
-			//    if (target != null) {
-			//        foreach (Treenode source in kv.Value) {
-			//            source.data = target;
-			//        }
-			//    } else {
-			//        Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
-			//        foreach (Treenode source in kv.Value) {
-			//            Console.WriteLine(source.FullPath);
-			//        }
-			//    }
-			//}
+					if (target != null) {
+						foreach (Treenode source in kv.Value) {
+							source.data = target;
+						}
+					} else {
+						Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
+						foreach (Treenode source in kv.Value) {
+							Console.WriteLine(source.FullPath);
+						}
+					}
+				}
+				
+				return root;
+			} catch {
+				throw new Exception("File appears to be corrupt");
+			}
 
-			return root;
+			return null;
+
+			
+
 		}
 
 		private static Treenode _Read(Stream stream, ref int count, SortedList<int, List<Treenode>> couplings, SortedList<int, Treenode> nodeArray) {
@@ -406,6 +420,7 @@ namespace FsmReader {
 
 			writer.Write(root.Title.Length + 1);
 			writer.Write(Encoding.ASCII.GetBytes(root.Title + '\0'));
+
 
 			writer.Write((uint)root.DataType);
 

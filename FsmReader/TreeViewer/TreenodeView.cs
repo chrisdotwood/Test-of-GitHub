@@ -32,6 +32,9 @@ namespace TreeViewer {
 				case "Flags":
 				case "FlagsExtended":
 				case "DataType": propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("IconPath")); break;
+				case "Data":
+				case "DataAsString":
+				case "DataAsDouble": propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("DataAsString")); break;
 			}
 		}
 
@@ -49,13 +52,7 @@ namespace TreeViewer {
 
 		public string DataAsString {
 			get {
-				string str = Treenode.DataAsString;
-				//int eol = str.IndexOf('\n');
-				//if (eol < 0) {
-				return str;
-				//} else {
-				//    return str.Substring(0, eol);
-				//}
+				return Treenode.DataAsString;
 			}
 		}
 
