@@ -80,7 +80,7 @@ namespace TreeViewer {
 				}
 
 				foreach (TreenodeView n in items) {
-					if (n.Treenode == node) {
+					if (n.RepresentsNode(node)) {
 						item = n;
 						if (item.Parent != null) {
 							item.Parent.IsExpanded = true;
@@ -130,7 +130,7 @@ namespace TreeViewer {
 			if (result.HasValue && result.Value) {
 				try {
 					using (FileStream fs = new FileStream(sfd.FileName, FileMode.Create)) {
-						Treenode.Write(SelectedItem.Treenode, fs);
+						TreenodeView.Write(SelectedItem, fs);
 					}
 				} catch (Exception ex) {
 					MessageBox.Show("An error occurred whilst saving the file:" + Environment.NewLine + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);

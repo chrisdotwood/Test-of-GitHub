@@ -14,14 +14,14 @@ using FsmReader;
 
 namespace TreeViewer {
 	/// <summary>
-	/// Interaction logic for SearchDialog.xaml
+	/// Interaction logic for SearchView.xaml
 	/// </summary>
-	public partial class SearchDialog : Window {
-		public SearchDialog() {
+	public partial class SearchView : Window {
+		public SearchView() {
 			InitializeComponent();
 		}
 
-		public SearchDialog(Treenode root) {
+		public SearchView(Treenode root) {
 			InitializeComponent();
 
 			SearchViewModel svm = new SearchViewModel(root);
@@ -29,5 +29,6 @@ namespace TreeViewer {
 
 			this.DataContext = svm;
 		}
+
 	}
 }

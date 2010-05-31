@@ -113,7 +113,7 @@ namespace TreeViewer {
 
 		DepthFirstSearch searchDpt;
 		private void SearchCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
-			SearchDialog d = new SearchDialog(LeftFsmTree.DataContext as Treenode);
+			SearchView d = new SearchView(LeftFsmTree.DataContext as Treenode);
 			d.ShowDialog();
 
 			return;
@@ -200,12 +200,12 @@ namespace TreeViewer {
 				LeftCodeText.Text = "";
 				LeftTreePath.Text = "No Node Selected";
 			} else {
-				LeftCodeText.Text = node.Treenode.Data == null ? "" : node.Treenode.Data.ToString();
-				LeftTreePath.Text = node.Treenode.FullPath;
-				LeftFlags.DataContext = node.Treenode;
+				LeftCodeText.Text = node.DataAsString;
+				LeftTreePath.Text = node.FullPath;
+				LeftFlags.DataContext = node;
 
 				Treenode rightRoot = (Treenode)RightFsmTree.Tree.DataContext;
-				Treenode rightNode = Treenode.NodeFromPath(node.Treenode.FullPath, rightRoot);
+				Treenode rightNode = Treenode.NodeFromPath(node.FullPath, rightRoot);
 				if (rightNode != null) {
 					RightFsmTree.SelectNode(rightNode);
 
@@ -220,9 +220,9 @@ namespace TreeViewer {
 				RightCodeText.Text = "";
 				RightTreePath.Text = "No Node Selected";
 			} else {
-				RightCodeText.Text = node.Treenode.Data == null ? "" : node.Treenode.Data.ToString();
-				RightTreePath.Text = node.Treenode.FullPath;
-				RightFlags.DataContext = node.Treenode;
+				RightCodeText.Text = node.DataAsString;
+				RightTreePath.Text = node.FullPath;
+				RightFlags.DataContext = node;
 			}
 		}
 
@@ -249,7 +249,7 @@ namespace TreeViewer {
 		private void HandleTextChanged(FsmTreeView tree, TextEditor text) {
 			if (tree.SelectedItem == null) return;
 
-			Treenode node = tree.SelectedItem.Treenode;
+			TreenodeView node = tree.SelectedItem;
 			if (node.DataType == DataType.ByteBlock) {
 				node.DataAsString = text.Text;
 			} else if (node.DataType == DataType.Float) {
@@ -325,8 +325,8 @@ namespace TreeViewer {
 				MergeToolState state = new MergeToolState() {
 					LeftPath = leftTempPath,
 					RightPath = rightTempPath,
-					LeftTreenode = LeftFsmTree.SelectedItem.Treenode,
-					RightTreenode = RightFsmTree.SelectedItem.Treenode
+					LeftTreenode = LeftFsmTree.SelectedItem,
+					RightTreenode = RightFsmTree.SelectedItem
 				};
 				mergeToolEdits.Add(proc.Id, state);
 
@@ -343,8 +343,8 @@ namespace TreeViewer {
 			public string LeftPath;
 			public string RightPath;
 
-			public Treenode LeftTreenode;
-			public Treenode RightTreenode;
+			public TreenodeView LeftTreenode;
+			public TreenodeView RightTreenode;
 		}
 		
 
@@ -358,11 +358,11 @@ namespace TreeViewer {
 				try {
 					string leftEdited = ReadTextFile(state.LeftPath);
 					if (leftEdited != state.LeftTreenode.DataAsString) {
-						state.LeftTreenode.Data = leftEdited;
+						state.LeftTreenode.DataAsString = leftEdited;
 					}
 					string rightEdited = ReadTextFile(state.RightPath);
 					if (rightEdited != state.RightTreenode.DataAsString) {
-						state.RightTreenode.Data = rightEdited;
+						state.RightTreenode.DataAsString = rightEdited;
 					}
 				} catch (Exception ex) {
 					MessageBox.Show("An error has occurred when loading the changes: " + ex.Message, "Merge Error", MessageBoxButton.OK, MessageBoxImage.Error);

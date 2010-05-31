@@ -8,7 +8,7 @@ using SmartWeakEvent;
 namespace TreeViewer {
 	public class TreenodeView : INotifyPropertyChanged {
 		private ObservableCollection<TreenodeView> children = new ObservableCollection<TreenodeView>();
-		public Treenode Treenode { get; set; }
+		private Treenode Treenode { get; set; }
 		public TreenodeView Parent { get; set; }
 
 		public TreenodeView(Treenode node, TreenodeView parent) {
@@ -48,11 +48,42 @@ namespace TreeViewer {
 			get {
 				return Treenode.Title;
 			}
+			set {
+				Treenode.Title = value;
+			}
 		}
 
 		public string DataAsString {
 			get {
 				return Treenode.DataAsString;
+			}
+			set {
+				Treenode.DataAsString = value;
+			}
+		}
+
+		public Flags Flags {
+			get {
+				return Treenode.Flags;
+			}set {
+				 Treenode.Flags = value;
+			}
+		}
+
+		public FlagsExtended FlagsExtended {
+			get {
+				return Treenode.FlagsExtended;
+			}set {
+				 Treenode.FlagsExtended = value;
+			}
+		}
+
+		public DataType DataType {
+			get {
+				return Treenode.DataType;
+			}
+			set {
+				Treenode.DataType = value;
 			}
 		}
 
@@ -118,5 +149,28 @@ namespace TreeViewer {
 		}
 
 		#endregion
+
+		public string FullPath {
+			get {
+				return Treenode.FullPath;
+			}
+		}
+
+		public double DataAsDouble {
+			get {
+				return Treenode.DataAsDouble;
+			}
+			set {
+				Treenode.DataAsDouble = value;
+			}
+		}
+
+		internal bool RepresentsNode(FsmReader.Treenode node) {
+			return Treenode == node;
+		}
+
+		internal static void Write(TreenodeView SelectedItem, System.IO.FileStream fs) {
+			Treenode.Write(SelectedItem.Treenode, fs);
+		}
 	}
 }

@@ -15,7 +15,7 @@
 		<local:FsmTreeView x:Name="FsmTree" Margin="5" SelectedItemChanged="FsmTree_SelectedItemChanged"/>
 		<GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Grid.Row="0" Height="2"/>
 		<DockPanel Grid.Row="1">
-			<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Name="TreePath" Background="LightGray"/>
+			<TextBlock DockPanel.Dock="Top" Padding="3" Margin="5" Text="{Binding CurrentNode.FullPath}" Background="LightGray"/>
 			<avalon:TextEditor DockPanel.Dock="Bottom" Grid.Row="1" Margin="5" Name="CodeText" Document="{Binding CurrentNode.DataAsString}" FontFamily="Consolas" TextChanged="CodeText_TextChanged"/>
 		</DockPanel>
 	</Grid>

@@ -19,19 +19,19 @@ namespace TreeViewer {
 	/// Interaction logic for TreeCodeBrowser.xaml
 	/// </summary>
 	public partial class TreeCodeBrowser : UserControl {
-		public Treenode RootNode {
-			get { return (Treenode)GetValue(RootNodeProperty); }
+		public TreenodeView RootNode {
+			get { return (TreenodeView)GetValue(RootNodeProperty); }
 			set { SetValue(RootNodeProperty, value); }
 		}
 
-		public Treenode CurrentNode {
+		public TreenodeView CurrentNode {
 			get;
 			set;
 		}
 
 		// Using a DependencyProperty as the backing store for RootNode.  This enables animation, styling, binding, etc...
 		public static readonly DependencyProperty RootNodeProperty =
-			DependencyProperty.Register("RootNode", typeof(Treenode), typeof(TreeCodeBrowser),
+			DependencyProperty.Register("RootNode", typeof(TreenodeView), typeof(TreeCodeBrowser),
 			new UIPropertyMetadata() {
 				DefaultValue = null,
 				PropertyChangedCallback = new PropertyChangedCallback(RootNodePropertyChanged)
@@ -53,11 +53,11 @@ namespace TreeViewer {
 			TreenodeView node = ((FsmTreeView)sender).SelectedItem;
 			
 			if (node == null) {
-				TreePath.Text = "No Node Selected";
+				//TreePath.Text = "No Node Selected";
 				CurrentNode = null;
 			} else {
-				TreePath.Text = node.Treenode.FullPath;
-				CurrentNode = node.Treenode;
+				//TreePath.Text = node.FullPath;
+				CurrentNode = node;
 				//select lines 3 to 5
 				//if (Tree.Document.LineCount > 5) {
 				//    int start = Tree.Document.GetLineByNumber(3).Offset;
@@ -68,7 +68,7 @@ namespace TreeViewer {
 		}
 
 		private void CodeText_TextChanged(object sender, EventArgs e) {
-			CurrentNode.Data = CodeText.Text;
+			CurrentNode.DataAsString = CodeText.Text;
 		}
 	}
 }

@@ -291,20 +291,20 @@ namespace FsmReader {
 
 				// Connect the couplings
 				// May need to check bi-directionality of these
-				foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
-					Treenode target = nodeArray[kv.Key];
+				//foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
+				//    Treenode target = nodeArray[kv.Key];
 
-					if (target != null) {
-						foreach (Treenode source in kv.Value) {
-							source.data = target;
-						}
-					} else {
-						Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
-						foreach (Treenode source in kv.Value) {
-							Console.WriteLine(source.FullPath);
-						}
-					}
-				}
+				//    if (target != null) {
+				//        foreach (Treenode source in kv.Value) {
+				//            source.data = target;
+				//        }
+				//    } else {
+				//        Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
+				//        foreach (Treenode source in kv.Value) {
+				//            Console.WriteLine(source.FullPath);
+				//        }
+				//    }
+				//}
 				
 				return root;
 			} catch {
@@ -312,9 +312,6 @@ namespace FsmReader {
 			}
 
 			return null;
-
-			
-
 		}
 
 		private static Treenode _Read(Stream stream, ref int count, SortedList<int, List<Treenode>> couplings, SortedList<int, Treenode> nodeArray) {
