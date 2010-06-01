@@ -33,15 +33,15 @@
 					<RowDefinition Height="*"/>
 					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
-				<local:FsmTreeView DataContext="{Binding LeftFsmTree}" Margin="5" />
-				<local:TreenodeFlagControl Margin="5,0,5,5"  Grid.Row="1" x:Name="LeftFlags" />
+				<local:FsmTreeView x:Name="LeftTreeView" Margin="5" />
+				<local:TreenodeFlagControl DataContext="{Binding LeftFsmTree.SelectedItem}" Margin="5,0,5,5"  Grid.Row="1" x:Name="LeftFlags" />
 			</Grid>
 			<Grid Grid.Column="2">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="*"/>
 					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
-				<local:FsmTreeView DataContext="{Binding RightFsmTree}" Margin="5"  />
+				<local:FsmTreeView x:Name="RightTreeView" Margin="5"  />
 				<local:TreenodeFlagControl Margin="5,0,5,5" Grid.Row="1" x:Name="RightFlags" />
 			</Grid>
 			<DockPanel Grid.Row="2" Grid.Column="0">

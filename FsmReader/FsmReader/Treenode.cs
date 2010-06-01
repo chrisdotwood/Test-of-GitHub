@@ -151,8 +151,8 @@ namespace FsmReader {
 
 		public override ReadOnlyCollection<Composite> Children {
 			get {
-				List<Composite> c = NodeChildren.ToList<Composite>();
-				c.AddRange(DataChildren);
+				List<Composite> c = DataChildren.ToList<Composite>();
+				c.AddRange(NodeChildren);
 
 				//TODO This needs to be implemented in a more performant manner
 				return new ReadOnlyCollection<Composite>(c);

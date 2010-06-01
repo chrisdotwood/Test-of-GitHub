@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using SmartWeakEvent;
+using System.Windows;
 
 namespace TreeViewer {
 	public class TreenodeViewModel : ViewModelBase {
@@ -92,18 +93,18 @@ namespace TreeViewer {
 			}
 		}
 
-		private bool isSelected = false;
+
+
 		public bool IsSelected {
-			get {
-				return isSelected;
-			}
-			set {
-				if (value != isSelected) {
-					isSelected = value;
-					propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("IsSelected"));
-				}
-			}
+			get { return (bool)GetValue(IsSelectedProperty); }
+			set { SetValue(IsSelectedProperty, value); }
 		}
+
+		// Using a DependencyProperty as the backing store for IsSelected.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty IsSelectedProperty =
+			DependencyProperty.Register("IsSelected", typeof(bool), typeof(TreenodeViewModel), new UIPropertyMetadata(false));
+
+
 
 		private bool isExpanded = false;
 		public bool IsExpanded {

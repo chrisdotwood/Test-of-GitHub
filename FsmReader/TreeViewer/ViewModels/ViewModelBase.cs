@@ -7,25 +7,13 @@ using System.Diagnostics;
 using System.Windows;
 
 namespace TreeViewer {
-	public class ViewModelBase : DependencyObject, INotifyPropertyChanged, IDisposable {
-		public event PropertyChangedEventHandler PropertyChanged;
-
+	public class ViewModelBase : DependencyObject, IDisposable {
 		public string DisplayName {
 			get;
 			set;
 		}
 
 		public Action<Action> UIAction = ((uiaction) => uiaction());
-
-		protected virtual void OnPropertyChanged(string propertyName) {
-			this.VerifyPropertyName(propertyName);
-
-			PropertyChangedEventHandler handler = this.PropertyChanged;
-			if (handler != null) {
-				var e = new PropertyChangedEventArgs(propertyName);
-				handler(this, e);
-			}
-		}
 
 		[Conditional("DEBUG")]
 		[DebuggerStepThrough]

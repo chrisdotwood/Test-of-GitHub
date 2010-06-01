@@ -11,7 +11,7 @@
                 <MenuItem Header="Save Node" Command="{Binding SaveAsCommand}" />
             </ContextMenu>
         </Grid.Resources>
-		<TreeView ItemsSource="{Binding RootNode.Children}" SelectedItemChanged="tree_SelectedItemChanged" VirtualizingStackPanel.IsVirtualizing="True">
+		<TreeView ItemsSource="{Binding RootNode.Children}" VirtualizingStackPanel.IsVirtualizing="True">
             <TreeView.Resources>
                 <local:BooleanToVisibilityConverter x:Key="visibilityConverter"/>
 				

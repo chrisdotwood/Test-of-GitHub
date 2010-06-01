@@ -84,28 +84,29 @@ namespace TreeViewer {
 
 		#region Properties
 
-		private double progressPercentage;
 		public double ProgressPercentage {
-			get {
-				return progressPercentage;
-			}
-			set {
-				progressPercentage = value;
-				OnPropertyChanged("ProgressPercentage");
-			}
+			get { return (double)GetValue(ProgressPercentageProperty); }
+			set { SetValue(ProgressPercentageProperty, value); }
 		}
 
-		private Treenode result;
+		// Using a DependencyProperty as the backing store for ProgressPercentage.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty ProgressPercentageProperty =
+			DependencyProperty.Register("ProgressPercentage", typeof(double), typeof(SearchViewModel), new UIPropertyMetadata(0));
+
+
+
+
+
 		public Treenode Result {
-			get {
-				return result;
-			}
-			set {
-				result = value;
-				OnPropertyChanged("Result");
-				CommandManager.InvalidateRequerySuggested();
-			}
+			get { return (Treenode)GetValue(ResultProperty); }
+			set { SetValue(ResultProperty, value); }
 		}
+
+		// Using a DependencyProperty as the backing store for Result.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty ResultProperty =
+			DependencyProperty.Register("Result", typeof(Treenode), typeof(SearchViewModel), new UIPropertyMetadata(null));
+
+
 
 		public TreenodeViewModel RootNode {
 			get;
@@ -126,16 +127,18 @@ namespace TreeViewer {
 			set;
 		}
 
-		private bool findAllDataTypes = true;
+
+
 		public bool FindAllDataTypes {
-			get {
-				return findAllDataTypes;
-			}
-			set {
-				findAllDataTypes = value;
-				OnPropertyChanged("FindAllDataTypes");
-			}
+			get { return (bool)GetValue(FindAllDataTypesProperty); }
+			set { SetValue(FindAllDataTypesProperty, value); }
 		}
+
+		// Using a DependencyProperty as the backing store for FindAllDataTypes.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty FindAllDataTypesProperty =
+			DependencyProperty.Register("FindAllDataTypes", typeof(bool), typeof(SearchViewModel), new UIPropertyMetadata(true));
+
+
 
 		public bool FindAllFlags {
 			get;

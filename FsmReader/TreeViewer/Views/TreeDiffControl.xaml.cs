@@ -32,9 +32,12 @@ namespace TreeViewer {
 			LeftCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
 			//RightCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
 
-			TreeDiffControlViewModel vm = new TreeDiffControlViewModel();
-			vm.UIAction = (s) => this.Dispatcher.BeginInvoke(s, null);
+            FsmTreeViewModel lvm = (FsmTreeViewModel)LeftTreeView.DataContext;
+            FsmTreeViewModel rvm = (FsmTreeViewModel)RightTreeView.DataContext;
 
+			TreeDiffControlViewModel vm = new TreeDiffControlViewModel(lvm, rvm);
+            vm.UIAction = (s) => this.Dispatcher.BeginInvoke(s, null);
+          
 			this.DataContext = vm;
 		}
 
