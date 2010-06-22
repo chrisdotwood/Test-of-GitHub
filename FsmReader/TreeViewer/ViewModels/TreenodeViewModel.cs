@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SmartWeakEvent;
 using System.Windows;
+using System;
 
 namespace TreeViewer {
 	public class TreenodeViewModel : ViewModelBase {
@@ -30,6 +31,27 @@ namespace TreeViewer {
 
 		public static Treenode GetTreenode(TreenodeViewModel vm) {
 			return vm.Treenode;
+		}
+
+		// TODO Remove this duplication of code from Treenode.cs
+		public static TreenodeViewModel NodeFromPath(string path, TreenodeViewModel relativeTo) {
+			if (path == null) throw new ArgumentException("path");
+			if (relativeTo == null) throw new ArgumentException("relativeTo");
+
+			string[] parts = path.Split(new char[] { '/' });
+
+			if (parts.Length < 1 || parts[1] != relativeTo.Title) {
+				// The root node of the search differs
+				return null;
+			}
+
+			TreenodeViewModel node = relativeTo;
+
+			// Start on 2 because of the leading forward slash giving an empty string and the starting nodes being the same
+			for (int p = 2; p < parts.Length && node != null; p++) {
+				node = node.Children.FirstOrDefault(s => s.Title == parts[p]);
+			}
+			return node;
 		}
 
 		void Treenode_PropertyChanged(object sender, PropertyChangedEventArgs e) {

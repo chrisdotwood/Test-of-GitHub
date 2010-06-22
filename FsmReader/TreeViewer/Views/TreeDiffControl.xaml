@@ -15,9 +15,10 @@
 	<DockPanel>
 		<ToolBar DockPanel.Dock="Top">
 			<Button Margin="3" Command="{Binding OpenCommand}">Open</Button>
-			<Button Margin="3" Command="{Binding SaveCommand}">Save</Button>
-			<Button Margin="3" Command="{Binding SearchCommand}">Search</Button>
-		</ToolBar>
+            <Button Margin="3" Command="{Binding SaveCommand}">Save</Button>
+            <Button Margin="3" Command="{Binding SearchCommand}">Search</Button>
+            <Button Margin="3" Command="{Binding NextDifferenceCommand}">Next Difference</Button>
+        </ToolBar>
 
 		<Grid DockPanel.Dock="Bottom">
 			<Grid.RowDefinitions>

@@ -43,14 +43,8 @@ namespace TreeViewer.ViewModels {
             MergeToolCommand = new RelayCommand(MergeToolCommand_Executed);
             SearchCommand = new RelayCommand(SearchCommandBinding_Executed, new Predicate<object>((s) => LeftFsmTree != null));
             OpenCommand = new RelayCommand(OpenCommandBinding_Executed);
-
-			leftFsmTree.PropertyChanged += new PropertyChangedEventHandler(lvm_PropertyChanged);
+			NextDifferenceCommand = new RelayCommand(NextDifferenceCommandBinding_Executed, (s) => LeftFsmTree != null && RightFsmTree != null);
         }
-
-		void lvm_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-			Console.WriteLine();
-		}
-
 
         #region Load File Worker
 
@@ -197,6 +191,11 @@ namespace TreeViewer.ViewModels {
             private set;
         }
 
+		public ICommand NextDifferenceCommand {
+			get;
+			private set;
+		}
+
         public ICommand MergeToolCommand {
             get;
             private set;
@@ -275,42 +274,6 @@ namespace TreeViewer.ViewModels {
 
         #endregion
 
-        #region Tree Event Handlers
-
-        //private void LeftFsmTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
-        //    TreenodeViewModel node = ((FsmTreeView)sender).SelectedItem;
-        //    if (node == null) {
-        //        LeftCodeText.Text = "";
-        //        LeftTreePath.Text = "No Node Selected";
-        //    } else {
-        //        LeftCodeText.Text = node.DataAsString;
-        //        LeftTreePath.Text = node.FullPath;
-        //        LeftFlags.DataContext = node;
-
-        //        Treenode rightRoot = (Treenode)RightFsmTree.Tree.DataContext;
-        //        Treenode rightNode = Treenode.NodeFromPath(node.FullPath, rightRoot);
-        //        if (rightNode != null) {
-        //            RightFsmTree.SelectNode(rightNode);
-
-        //            DiffCode();
-        //        }
-        //    }
-        //}
-
-        //private void RightFsmTree_SelectedItemChanged(object sender, RoutedEventArgs e) {
-        //    TreenodeViewModel node = ((FsmTreeView)sender).SelectedItem;
-        //    if (node == null) {
-        //        RightCodeText.Text = "";
-        //        RightTreePath.Text = "No Node Selected";
-        //    } else {
-        //        RightCodeText.Text = node.DataAsString;
-        //        RightTreePath.Text = node.FullPath;
-        //        RightFlags.DataContext = node;
-        //    }
-        //}
-
-        #endregion
-
         #region Text Editor Event Handlers
 
         //private void LeftCodeScrolled(object sender, ScrollChangedEventArgs args) {
@@ -367,7 +330,34 @@ namespace TreeViewer.ViewModels {
 
         #endregion
 
+		private DepthFirstSearch nextDiffSearch;
+       
+		private void NextDifferenceCommandBinding_Executed(object sender) {
+			if (nextDiffSearch == null) {
+				nextDiffSearch = new DepthFirstSearch(TreenodeViewModel.GetTreenode(LeftFsmTree.RootNode));
+				
+			}
+			bool result = false;
+			nextDiffSearch.FindNode((s) => {
+				Treenode other = Treenode.NodeFromPath(s.FullPath, TreenodeViewModel.GetTreenode(RightFsmTree.RootNode));
+				
+				result = other == null || (other.DataType == DataType.ByteBlock && s.DataType == DataType.ByteBlock && other.DataAsString != s.DataAsString);
 
+				if (result) {
+					LeftFsmTree.SelectedItem = TreenodeViewModel.NodeFromPath(s.FullPath, LeftFsmTree.RootNode);
+					if (other != null) {
+						RightFsmTree.SelectedItem = TreenodeViewModel.NodeFromPath(s.FullPath, RightFsmTree.RootNode);
+					}
+				}
+
+				return result;
+			});
+			if (result == false) {
+				MessageBox.Show("No more differences found", "No Differences", MessageBoxButton.OK);
+				nextDiffSearch = null;
+			}
+		}
+		
         Dictionary<int, MergeToolState> mergeToolEdits = new Dictionary<int, MergeToolState>();
 
         class MergeToolState {
@@ -406,5 +396,6 @@ namespace TreeViewer.ViewModels {
                 return sr.ReadToEnd();
             }
         }
-    }
+
+	}
 }

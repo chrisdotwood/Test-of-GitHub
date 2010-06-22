@@ -31,17 +31,18 @@ namespace TreeViewer {
 			InitializeComponent();
 
 			LeftCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
-			//RightCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
+			RightCodeText.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
 
             FsmTreeViewModel lvm = (FsmTreeViewModel)LeftTreeView.DataContext;
             FsmTreeViewModel rvm = (FsmTreeViewModel)RightTreeView.DataContext;
 
 			TreeDiffControlViewModel vm = new TreeDiffControlViewModel(lvm, rvm);
             vm.UIAction = (s) => this.Dispatcher.BeginInvoke(s, null);
-          
+
 			this.DataContext = vm;
 		}
 
+		
 		private void UserControl_Loaded(object sender, RoutedEventArgs e) {
 			LeftCodeText.ScrollViewer.ScrollChanged += new ScrollChangedEventHandler(ScrollViewer_ScrollChanged);
 		}
@@ -51,6 +52,9 @@ namespace TreeViewer {
 		}
 	}
 
+	/// <summary>
+	/// Converts a string to a <see cref="ICSharpCode.AvalonEdit.Document.TextDocument"/>
+	/// </summary>
 	public class TextToDocumentConvert : IValueConverter {
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
 			return new TextDocument(value as string);
@@ -60,5 +64,4 @@ namespace TreeViewer {
 			return ((TextDocument)value).Text;
 		}
 	}
-
 }
