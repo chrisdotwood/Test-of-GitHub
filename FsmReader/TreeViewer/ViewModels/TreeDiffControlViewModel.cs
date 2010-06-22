@@ -21,11 +21,11 @@ namespace TreeViewer.ViewModels {
 
         public static RoutedCommand MatchScrolling = new RoutedCommand();
 
-        FsmTreeViewModel lvm, rvm;
+        FsmTreeViewModel leftFsmTree, rightFsmTree;
 
         public TreeDiffControlViewModel(FsmTreeViewModel l, FsmTreeViewModel r) {
-            lvm = l;
-            rvm = r;
+            leftFsmTree = l;
+            rightFsmTree = r;
 
             CommandBinding matchScrollingBinding = new CommandBinding(MatchScrolling,
                 new ExecutedRoutedEventHandler(MatchScrollingCommandBinding_Executed),
@@ -43,34 +43,40 @@ namespace TreeViewer.ViewModels {
             MergeToolCommand = new RelayCommand(MergeToolCommand_Executed);
             SearchCommand = new RelayCommand(SearchCommandBinding_Executed, new Predicate<object>((s) => LeftFsmTree != null));
             OpenCommand = new RelayCommand(OpenCommandBinding_Executed);
+
+			leftFsmTree.PropertyChanged += new PropertyChangedEventHandler(lvm_PropertyChanged);
         }
+
+		void lvm_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+			Console.WriteLine();
+		}
+
 
         #region Load File Worker
 
-
-
-
-        public TreenodeViewModel RightFsmTree {
-            get { return (TreenodeViewModel)GetValue(RightFsmTreeProperty); }
-            set { SetValue(RightFsmTreeProperty, value); }
+		public FsmTreeViewModel RightFsmTree {
+            get { 
+				return rightFsmTree; 
+			}
+            set {
+				if (rightFsmTree != value) {
+					rightFsmTree = value;
+					FirePropertyChanged("RightFsmTree");
+				}
+			}
         }
 
-        // Using a DependencyProperty as the backing store for RightFsmTree.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty RightFsmTreeProperty =
-            DependencyProperty.Register("RightFsmTree", typeof(TreenodeViewModel), typeof(TreeDiffControlViewModel), new UIPropertyMetadata(null));
-
-
-
-        public TreenodeViewModel LeftFsmTree {
-            get { return (TreenodeViewModel)GetValue(LeftFsmTreeProperty); }
-            set { SetValue(LeftFsmTreeProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for LeftFsmTree.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty LeftFsmTreeProperty =
-            DependencyProperty.Register("LeftFsmTree", typeof(TreenodeViewModel), typeof(TreeDiffControlViewModel), new UIPropertyMetadata(null));
-
-
+		public FsmTreeViewModel LeftFsmTree {
+			get {
+				return leftFsmTree;
+			}
+			set {
+				if (leftFsmTree != value) {
+					leftFsmTree = value;
+					FirePropertyChanged("LeftFsmTree");
+				}
+			}
+		}
 
         private class LoadFileWorkerArgument {
             public string Path;
@@ -121,7 +127,7 @@ namespace TreeViewer.ViewModels {
         #region Command Binding Event Handlers
 
         private void SearchCommandBinding_Executed(object sender) {
-            SearchView d = new SearchView(LeftFsmTree);
+            SearchView d = new SearchView(LeftFsmTree.RootNode);
             d.ShowDialog();
         }
 
@@ -139,13 +145,13 @@ namespace TreeViewer.ViewModels {
             if (result.HasValue && result.Value == true) {
                 loadFileWorker.RunWorkerAsync(new LoadFileWorkerArgument() {
                     Path = ofd.LeftPath,
-                    Target = lvm
+                    Target = leftFsmTree
                 });
 
                 LeftFilePath = ofd.LeftPath;
                 loadFileWorker2.RunWorkerAsync(new LoadFileWorkerArgument() {
                     Path = ofd.RightPath,
-                    Target = rvm
+                    Target = rightFsmTree
                 });
                 RightFilePath = ofd.RightPath;
             }
@@ -153,45 +159,31 @@ namespace TreeViewer.ViewModels {
 
         #region Properties
 
+		private string leftFilePath;
         public string LeftFilePath {
-            get { return (string)GetValue(LeftFilePathProperty); }
-            set { SetValue(LeftFilePathProperty, value); }
+			get {
+				return leftFilePath;
+			}
+            set {
+				if (leftFilePath != value) {
+					leftFilePath = value;
+					FirePropertyChanged("LeftFilePath");
+				}
+			}
         }
 
-        // Using a DependencyProperty as the backing store for LeftFilePath.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty LeftFilePathProperty =
-            DependencyProperty.Register("LeftFilePath", typeof(string), typeof(TreeDiffControlViewModel), new UIPropertyMetadata(""));
-
-        public string RightFilePath {
-            get { return (string)GetValue(RightFilePathProperty); }
-            set { SetValue(RightFilePathProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for RightFilePath.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty RightFilePathProperty =
-            DependencyProperty.Register("RightFilePath", typeof(string), typeof(TreeDiffControlViewModel), new UIPropertyMetadata(""));
-
-
-
-        //public string LeftCodeText {
-        //    get { return (string)GetValue(LeftCodeTextProperty); }
-        //    set { SetValue(LeftCodeTextProperty, value); }
-        //}
-
-        //// Using a DependencyProperty as the backing store for LeftCodeText.  This enables animation, styling, binding, etc...
-        //public static readonly DependencyProperty LeftCodeTextProperty =
-        //    DependencyProperty.Register("LeftCodeText", typeof(string), typeof(TreeDiffControlViewModel), new UIPropertyMetadata(""));
-
-
-
-        //public string RightCodeText {
-        //    get { return (string)GetValue(RightCodeTextProperty); }
-        //    set { SetValue(RightCodeTextProperty, value); }
-        //}
-
-        //// Using a DependencyProperty as the backing store for RightCodeText.  This enables animation, styling, binding, etc...
-        //public static readonly DependencyProperty RightCodeTextProperty =
-        //    DependencyProperty.Register("RightCodeText", typeof(string), typeof(TreeDiffControlViewModel), new UIPropertyMetadata(""));
+		private string rightFilePath;
+		public string RightFilePath {
+			get {
+				return rightFilePath;
+			}
+			set {
+				if (rightFilePath != value) {
+					rightFilePath = value;
+					FirePropertyChanged("RightFilePath");
+				}
+			}
+		}
 
         #endregion
 
@@ -222,7 +214,7 @@ namespace TreeViewer.ViewModels {
             if (result.HasValue && result.Value) {
                 // Add root node DP
                 using (FileStream fs = new FileStream(sfd.FileName, FileMode.Create)) {
-                    TreenodeViewModel.Write(LeftFsmTree, fs);
+                    TreenodeViewModel.Write(LeftFsmTree.RootNode, fs);
                 }
 
             }
@@ -242,11 +234,11 @@ namespace TreeViewer.ViewModels {
 
             try {
                 using (StreamWriter sw = new StreamWriter(new FileStream(leftTempPath, FileMode.OpenOrCreate))) {
-                    sw.Write(lvm.SelectedItem.DataAsString);
+                    sw.Write(leftFsmTree.SelectedItem.DataAsString);
                     sw.Close();
                 }
                 using (StreamWriter sw = new StreamWriter(new FileStream(rightTempPath, FileMode.OpenOrCreate))) {
-                    sw.Write(rvm.SelectedItem.DataAsString);
+                    sw.Write(rightFsmTree.SelectedItem.DataAsString);
                     sw.Close();
                 }
             } catch (Exception ex) {
@@ -269,8 +261,8 @@ namespace TreeViewer.ViewModels {
                 MergeToolState state = new MergeToolState() {
                     LeftPath = leftTempPath,
                     RightPath = rightTempPath,
-                    LeftTreenode = lvm.SelectedItem,
-                    RightTreenode = rvm.SelectedItem
+                    LeftTreenode = leftFsmTree.SelectedItem,
+                    RightTreenode = rightFsmTree.SelectedItem
                 };
                 mergeToolEdits.Add(proc.Id, state);
 
@@ -356,7 +348,7 @@ namespace TreeViewer.ViewModels {
         //}
 
         private void DiffCode() {
-            List<Change> changes = new Lcs().Diff(new DiffDocument(lvm.SelectedItem.DataAsString), new DiffDocument(rvm.SelectedItem.DataAsString));
+            List<Change> changes = new Lcs().Diff(new DiffDocument(leftFsmTree.SelectedItem.DataAsString), new DiffDocument(rightFsmTree.SelectedItem.DataAsString));
 
             foreach (Change c in changes) {
                 //if (c.Type == ChangeType.Remove) {

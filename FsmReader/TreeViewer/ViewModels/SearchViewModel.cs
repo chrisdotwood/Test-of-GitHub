@@ -84,30 +84,32 @@ namespace TreeViewer {
 
 		#region Properties
 
+		private double progressPercentage;
 		public double ProgressPercentage {
-			get { return (double)GetValue(ProgressPercentageProperty); }
-			set { SetValue(ProgressPercentageProperty, value); }
+			get {
+				return progressPercentage;
+			}
+			set {
+				if (progressPercentage != value) {
+					progressPercentage = value;
+					FirePropertyChanged("ProgressPercentage");
+				}
+			}
 		}
 
-		// Using a DependencyProperty as the backing store for ProgressPercentage.  This enables animation, styling, binding, etc...
-		public static readonly DependencyProperty ProgressPercentageProperty =
-			DependencyProperty.Register("ProgressPercentage", typeof(double), typeof(SearchViewModel), new UIPropertyMetadata(0));
-
-
-
-
-
+		private Treenode result;
 		public Treenode Result {
-			get { return (Treenode)GetValue(ResultProperty); }
-			set { SetValue(ResultProperty, value); }
+			get {
+				return result; 
+			}
+			set {
+				if (result != value) {
+					result = value;
+					FirePropertyChanged("Result");
+				}
+			}
 		}
-
-		// Using a DependencyProperty as the backing store for Result.  This enables animation, styling, binding, etc...
-		public static readonly DependencyProperty ResultProperty =
-			DependencyProperty.Register("Result", typeof(Treenode), typeof(SearchViewModel), new UIPropertyMetadata(null));
-
-
-
+		
 		public TreenodeViewModel RootNode {
 			get;
 			set;
@@ -128,15 +130,22 @@ namespace TreeViewer {
 		}
 
 
-
+		private bool findAllDataTypes;
 		public bool FindAllDataTypes {
-			get { return (bool)GetValue(FindAllDataTypesProperty); }
-			set { SetValue(FindAllDataTypesProperty, value); }
+			get {
+				return findAllDataTypes;
+			}
+			set {
+				if (value != findAllDataTypes) {
+					findAllDataTypes = value;
+					FirePropertyChanged("FindAllDataTypes");
+				}
+			}
 		}
 
-		// Using a DependencyProperty as the backing store for FindAllDataTypes.  This enables animation, styling, binding, etc...
-		public static readonly DependencyProperty FindAllDataTypesProperty =
-			DependencyProperty.Register("FindAllDataTypes", typeof(bool), typeof(SearchViewModel), new UIPropertyMetadata(true));
+		//// Using a DependencyProperty as the backing store for FindAllDataTypes.  This enables animation, styling, binding, etc...
+		//public static readonly DependencyProperty FindAllDataTypesProperty =
+		//    DependencyProperty.Register("FindAllDataTypes", typeof(bool), typeof(SearchViewModel), new UIPropertyMetadata(true));
 
 
 

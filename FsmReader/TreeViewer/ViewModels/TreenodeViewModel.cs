@@ -64,23 +64,25 @@ namespace TreeViewer {
 			}
 			set {
 				Treenode.DataAsString = value;
-					propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("DataAsString"));
+				propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("DataAsString"));
 			}
 		}
 
 		public Flags Flags {
 			get {
 				return Treenode.Flags;
-			}set {
-				 Treenode.Flags = value;
+			}
+			set {
+				Treenode.Flags = value;
 			}
 		}
 
 		public FlagsExtended FlagsExtended {
 			get {
 				return Treenode.FlagsExtended;
-			}set {
-				 Treenode.FlagsExtended = value;
+			}
+			set {
+				Treenode.FlagsExtended = value;
 			}
 		}
 
@@ -94,17 +96,18 @@ namespace TreeViewer {
 		}
 
 
-
+		private bool isSelected;
 		public bool IsSelected {
-			get { return (bool)GetValue(IsSelectedProperty); }
-			set { SetValue(IsSelectedProperty, value); }
+			get { 
+				return isSelected; 
+			}
+			set {
+				if (value != isSelected) {
+					isSelected = value;
+					FirePropertyChanged("IsSelected");
+				}
+			}
 		}
-
-		// Using a DependencyProperty as the backing store for IsSelected.  This enables animation, styling, binding, etc...
-		public static readonly DependencyProperty IsSelectedProperty =
-			DependencyProperty.Register("IsSelected", typeof(bool), typeof(TreenodeViewModel), new UIPropertyMetadata(false));
-
-
 
 		private bool isExpanded = false;
 		public bool IsExpanded {

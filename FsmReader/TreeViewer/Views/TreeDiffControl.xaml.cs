@@ -20,6 +20,7 @@ using Microsoft.Win32;
 using ICSharpCode.AvalonEdit;
 using System.Diagnostics;
 using TreeViewer.ViewModels;
+using ICSharpCode.AvalonEdit.Document;
 
 namespace TreeViewer {
 	/// <summary>
@@ -49,4 +50,15 @@ namespace TreeViewer {
 			//throw new NotImplementedException();
 		}
 	}
+
+	public class TextToDocumentConvert : IValueConverter {
+		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+			return new TextDocument(value as string);
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+			return ((TextDocument)value).Text;
+		}
+	}
+
 }

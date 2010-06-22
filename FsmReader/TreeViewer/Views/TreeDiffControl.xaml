@@ -9,8 +9,9 @@
 			 Loaded="UserControl_Loaded"
 			 x:Name="MainUserControl"
              d:DesignHeight="643" d:DesignWidth="1079">
-	<UserControl.CommandBindings>
-	</UserControl.CommandBindings>
+    <UserControl.Resources>
+        <local:TextToDocumentConvert x:Key="textConverter"/>
+    </UserControl.Resources>
 	<DockPanel>
 		<ToolBar DockPanel.Dock="Top">
 			<Button Margin="3" Command="{Binding OpenCommand}">Open</Button>
@@ -49,7 +50,7 @@
 				<StatusBar DockPanel.Dock="Bottom">
 					<TextBlock Text="{Binding LeftFilePath}"/>
 				</StatusBar>
-				<avalon:TextEditor DockPanel.Dock="Right" Margin="5" Document="{Binding LeftFsmTree.SelectedItem.DataAsString, NotifyOnSourceUpdated=True, Mode=TwoWay}" Name="LeftCodeText" FontFamily="Consolas"/>
+                <avalon:TextEditor DockPanel.Dock="Right" Margin="5" Document="{Binding LeftFsmTree.SelectedItem.DataAsString, Converter={StaticResource textConverter}, Mode=TwoWay}" Name="LeftCodeText" FontFamily="Consolas"/>
 			</DockPanel>
 			<GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="2" Grid.ColumnSpan="2"/>
 			<DockPanel Grid.Row="2" Grid.Column="2">
@@ -57,8 +58,7 @@
 				<StatusBar DockPanel.Dock="Bottom">
 					<TextBlock Text="{Binding RightFilePath}"/>
 				</StatusBar>
-                <!--avalon:TextEditor DockPanel.Dock="Bottom" Margin="5" Document="{Binding RightFsmTree.SelectedItem.DataAsString}" Name="RightCodeText" FontFamily="Consolas"/-->
-                <TextBox DockPanel.Dock="Bottom" Margin="5" Text="{Binding RightFsmTree.SelectedItem.DataAsString, TargetNullValue='asdasd asdasd'}" />
+                <avalon:TextEditor DockPanel.Dock="Bottom" Margin="5" Document="{Binding RightFsmTree.SelectedItem.DataAsString, Converter={StaticResource textConverter}, Mode=TwoWay}" Name="RightCodeText" FontFamily="Consolas"/>
             </DockPanel>
 			<StackPanel Grid.Row="1" Grid.Column="1">
 				<Button Margin="3" ToolTip="Open in Merge Tool" Command="{Binding MergeToolCommand}">M</Button>

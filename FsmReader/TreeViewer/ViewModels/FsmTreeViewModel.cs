@@ -16,17 +16,19 @@ namespace TreeViewer.ViewModels {
 			SaveAsCommand = new RelayCommand(SaveAsCommandBinding_Executed);
 		}
 
+		private TreenodeViewModel selectedItem;
 		public TreenodeViewModel SelectedItem {
-			get { return (TreenodeViewModel)GetValue(SelectedItemProperty); }
-			set { SetValue(SelectedItemProperty, value); }
+			get { 
+				return selectedItem; 
+			}
+			set {
+				if (selectedItem != value) {
+					selectedItem = value;
+					FirePropertyChanged("SelectedItem");
+				}
+			}
 		}
 
-		public static readonly DependencyProperty SelectedItemProperty =
-			DependencyProperty.Register("SelectedItem", typeof(TreenodeViewModel), typeof(FsmTreeViewModel),
-			new UIPropertyMetadata() {
-				DefaultValue = null,
-				PropertyChangedCallback = new PropertyChangedCallback(SelectedItemPropertyChanged)
-			});
 
 		public ICommand SaveAsCommand {
 			get;
@@ -91,25 +93,30 @@ namespace TreeViewer.ViewModels {
 			SelectedItem = item;
 		}
 
-
-
-		public TreenodeViewModel RootNode {
-			get { return (TreenodeViewModel)GetValue(RootNodeProperty); }
-			set { SetValue(RootNodeProperty, value); }
+		public ObservableCollection<TreenodeViewModel> RootContainer {
+			get {
+				return rootContainer;
+			}
 		}
 
-		// Using a DependencyProperty as the backing store for RootNode.  This enables animation, styling, binding, etc...
-		public static readonly DependencyProperty RootNodeProperty =
-			DependencyProperty.Register("RootNode", typeof(TreenodeViewModel), typeof(FsmTreeViewModel), new UIPropertyMetadata(null));
+		private ObservableCollection<TreenodeViewModel> rootContainer = new ObservableCollection<TreenodeViewModel>();
+		private TreenodeViewModel rootNode;
+		public TreenodeViewModel RootNode {
+			get {
+				return rootNode;
+			}
+			set {
+				if (rootNode != value) {
+					if (rootContainer.Contains(rootNode)) {
+						rootContainer.Remove(rootNode);
+					}
+					rootNode = value;
+					rootContainer.Add(rootNode);
 
-		//private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
-		//    if (e.NewValue == null) {
-		//        Tree.ItemsSource = null;
-		//    } else {
-		//        Tree.ItemsSource = new ObservableCollection<TreenodeView> { new TreenodeView((Treenode)e.NewValue, null) };
-		//    }
-		//}
-
+					FirePropertyChanged("RootNode");
+				}
+			}
+		}
 
 		#region Command Bindings
 

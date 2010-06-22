@@ -29,7 +29,8 @@ namespace TreeViewer {
 		public FsmTreeView() {
 			InitializeComponent();
 
-		    vm = new FsmTreeViewModel();
+			vm = new FsmTreeViewModel();
+
 			vm.UIAction = (s) => this.Dispatcher.BeginInvoke(s, null);
 
 			this.DataContext = vm;
@@ -39,7 +40,7 @@ namespace TreeViewer {
 			vm.SelectedItem = (TreenodeViewModel)e.NewValue;
 		}
 
-	
+		
 	}
 
 
