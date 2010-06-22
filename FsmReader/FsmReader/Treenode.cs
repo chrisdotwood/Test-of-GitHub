@@ -483,5 +483,18 @@ namespace FsmReader {
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-	}
+
+        public static void PrintTree(Treenode t, Stream s) {
+            using (StreamWriter sw = new StreamWriter(s)) {
+                _PrintTree(t, sw);
+            }
+        }
+
+        private static void _PrintTree(Treenode t, StreamWriter sw) {
+            sw.WriteLine(t.FullPath + " " + t.DataAsString);
+            foreach (Treenode child in t.Children) {
+                _PrintTree(child, sw);
+            }
+        }
+    }
 }
