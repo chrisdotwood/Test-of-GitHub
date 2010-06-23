@@ -13,6 +13,7 @@ using Microsoft.Win32;
 using System.Windows.Controls;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using ComparisonTools;
 
 namespace TreeViewer.ViewModels {
     public class TreeDiffControlViewModel : ViewModelBase {
@@ -344,9 +345,29 @@ namespace TreeViewer.ViewModels {
 				result = other == null || (other.DataType == DataType.ByteBlock && s.DataType == DataType.ByteBlock && other.DataAsString != s.DataAsString);
 
 				if (result) {
-					LeftFsmTree.SelectedItem = TreenodeViewModel.NodeFromPath(s.FullPath, LeftFsmTree.RootNode);
+					LeftFsmTree.SelectNode(s);
 					if (other != null) {
-						RightFsmTree.SelectedItem = TreenodeViewModel.NodeFromPath(s.FullPath, RightFsmTree.RootNode);
+						RightFsmTree.SelectNode(other);
+						
+						try {
+							TextDiffTool diff = new TextDiffTool(Properties.Settings.Default.DiffToolPath);
+
+							string tmpl = Path.GetTempFileName();
+							string tmpr = Path.GetTempFileName();
+
+							using (StreamWriter sw = new StreamWriter(tmpl)) {
+								sw.WriteLine(LeftFsmTree.SelectedItem.DataAsString);
+								sw.Flush();
+							}
+							using (StreamWriter sw = new StreamWriter(tmpr)) {
+								sw.WriteLine(RightFsmTree.SelectedItem.DataAsString);
+								sw.Flush();
+							}
+
+							List<Change> changes = diff.Diff(tmpl, tmpr);
+						} catch (Exception ex) {
+							MessageBox.Show("Error generating diff: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+						}
 					}
 				}
 

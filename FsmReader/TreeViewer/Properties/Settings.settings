@@ -9,7 +9,10 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="MergeToolPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Program Files\WinMerge\WinMergeU.exe</Value>
+      <Value Profile="(Default)">C:\Program Files (x86)\WinMerge\WinMergeU.exe</Value>
+    </Setting>
+    <Setting Name="DiffToolPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Users\Chris\Documents\Visual Studio 2010\Projects\Test-of-GitHub\Libraries\diff\diff.exe</Value>
     </Setting>
   </Settings>
 </SettingsFile>

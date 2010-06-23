@@ -41,18 +41,6 @@ namespace TreeViewer.ViewModels {
 			//tv.RaiseEvent(new RoutedEventArgs(FsmTreeView.SelectedItemChangedEvent));
 		}
 
-		//public static readonly RoutedEvent SelectedItemChangedEvent = EventManager.RegisterRoutedEvent(
-		//    "SelectedItemChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(FsmTreeView));
-
-		//public event RoutedEventHandler SelectedItemChanged {
-		//    add {
-		//        AddHandler(SelectedItemChangedEvent, value);
-		//    }
-		//    remove {
-		//        RemoveHandler(SelectedItemChangedEvent, value);
-		//    }
-		//}
-
 		public void SelectNode(Treenode target) {
 			if (RootNode == null) return;
 
@@ -93,6 +81,10 @@ namespace TreeViewer.ViewModels {
 			SelectedItem = item;
 		}
 
+		/// <summary>
+		/// This is an <see cref="System.Collections.Generic.ObjectModel.ObservableCollection"/> containing only one item, the RootNode of this tree. This is
+		/// used only as the item source when databinding a TreeView.
+		/// </summary>
 		public ObservableCollection<TreenodeViewModel> RootContainer {
 			get {
 				return rootContainer;

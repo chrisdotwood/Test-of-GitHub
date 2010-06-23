@@ -179,6 +179,10 @@
       <Project>{6C55B776-26D4-4DB3-A6AB-87E783B2F3D1}</Project>
       <Name>ICSharpCode.AvalonEdit</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ComparisonTools\ComparisonTools.csproj">
+      <Project>{F0FE1A29-27B4-4428-9326-A3A3C76B068E}</Project>
+      <Name>ComparisonTools</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Diff\Diff.csproj">
       <Project>{468ACA40-50A5-4B1E-AC4B-8E543EC2DDF9}</Project>
       <Name>Diff</Name>
