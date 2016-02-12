@@ -9,60 +9,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 
 namespace FsmReader {
-	#region Enums
 
-	public enum DataType : byte {
-		None = 0,
-		Float = 1,
-		ByteBlock = 2,
-		PointerCoupling = 3,
-		Object = 4,
-		Particle = 5
-	}
-
-	[Flags]
-	public enum Flags : byte {
-		None = 0x00,
-		Expanded = 0x01,
-		HasOwner = 0x02,
-		CppFunc = 0x04,
-		Selected = 0x08,
-		HideConnectors = 0x10,
-		HideLabel = 0x20,
-		FlagsExtended = 0x40,
-		FlagsExtendedA = 0x80
-	}
-
-	[Flags]
-	public enum FlagsExtended : uint {
-		None = 0x0,
-		ShowObject = 0x00000001,
-		Selected = 0x00000002,
-		Flexscript = 0x00000004,
-		Null = 0x00000008,
-
-		FunctionDisabled = 0x00000010,
-		Keyword = 0x00000020,
-		StateLocked = 0x00000040, // first used for port state-change masking
-		Hidden = 0x00000080, // prevent user viewing
-
-		Protected = 0x00000100, // prevent user editing
-		HideShape = 0x00000200,
-		ODTDerivative = 0x00000400,
-		HideBase = 0x00000800,
-
-		HideContent = 0x00001000,
-		StatStag = 0x00002000,
-		IndexCache = 0x00004000,
-		MaintainArray = 0x00008000,
-
-		DLLFunc = 0x00010000,
-		CustomDisplay = 0x00020000,
-		GlobalCPPFunc = 0x00040000,
-		ExecutingNow = 0x00080000
-	}
-
-	#endregion
 
 	public class Treenode : Composite, INotifyPropertyChanged {
 		public Treenode() {
@@ -74,15 +21,29 @@ namespace FsmReader {
 		private Treenode dataSizeNode;
 
 		#region Properties
+		private byte _Version;
 
-		public byte Version;
+		/// <summary>
+		/// Unsure - Seen 0x42 on stringnode.t.unzipped and 0xc2 on doublenode.t.unzipped
+		/// </summary>
+		public byte LoadVersion
+		{
+			get { return _Version; }
+			set
+			{
+				_Version = value;
+			}
+		}
 
 		private string title = "";
-		public string Title {
-			get {
+		public string Title
+		{
+			get
+			{
 				return title;
 			}
-			set {
+			set
+			{
 				if (value != title) {
 					title = value;
 					FirePropertyChanged("Title");
@@ -92,11 +53,14 @@ namespace FsmReader {
 		private object data;
 
 		private DataType dataType;
-		public DataType DataType {
-			get {
+		public DataType DataType
+		{
+			get
+			{
 				return dataType;
 			}
-			set {
+			set
+			{
 				if (value != dataType) {
 					dataType = value;
 					FirePropertyChanged("DataType");
@@ -105,11 +69,14 @@ namespace FsmReader {
 		}
 
 		private Flags flags = Flags.FlagsExtended;
-		public Flags Flags {
-			get {
+		public Flags Flags
+		{
+			get
+			{
 				return flags;
 			}
-			set {
+			set
+			{
 				if (value != flags) {
 					flags = value;
 					FirePropertyChanged("Flags");
@@ -118,11 +85,14 @@ namespace FsmReader {
 		}
 
 		private FlagsExtended flagsExtended;
-		public FlagsExtended FlagsExtended {
-			get {
+		public FlagsExtended FlagsExtended
+		{
+			get
+			{
 				return flagsExtended;
 			}
-			set {
+			set
+			{
 				if (value != flagsExtended) {
 					flagsExtended = value;
 					FirePropertyChanged("FlagsExtended");
@@ -139,18 +109,22 @@ namespace FsmReader {
 		public uint Size;
 
 		//public List<Treenode> dataChildren = new List<Treenode>();
-		public Collection<Treenode> NodeChildren {
+		public Collection<Treenode> NodeChildren
+		{
 			get;
 			private set;
 		}
 
-		public Collection<Treenode> DataChildren {
+		public Collection<Treenode> DataChildren
+		{
 			get;
 			private set;
 		}
 
-		public override ReadOnlyCollection<Composite> Children {
-			get {
+		public override ReadOnlyCollection<Composite> Children
+		{
+			get
+			{
 				List<Composite> c = DataChildren.ToList<Composite>();
 				c.AddRange(NodeChildren);
 
@@ -161,8 +135,10 @@ namespace FsmReader {
 
 		public Treenode Parent;
 
-		public string FullPath {
-			get {
+		public string FullPath
+		{
+			get
+			{
 				string path = "/" + Title;
 
 				Treenode up = Parent;
@@ -174,11 +150,14 @@ namespace FsmReader {
 			}
 		}
 
-		public object Data {
-			get {
+		public object Data
+		{
+			get
+			{
 				return data;
 			}
-			set {
+			set
+			{
 				if (value != data) {
 					data = value;
 					FirePropertyChanged("Data");
@@ -188,15 +167,18 @@ namespace FsmReader {
 			}
 		}
 
-		public string DataAsString {
-			get {
+		public string DataAsString
+		{
+			get
+			{
 				if (data != null) {
 					return data.ToString();
 				} else {
 					return "";
 				}
 			}
-			set {
+			set
+			{
 				Debug.Assert(DataType == FsmReader.DataType.ByteBlock);
 
 				if ((string)data != value) {
@@ -206,13 +188,16 @@ namespace FsmReader {
 			}
 		}
 
-		public double DataAsDouble {
-			get {
+		public double DataAsDouble
+		{
+			get
+			{
 				Debug.Assert(DataType == FsmReader.DataType.Float);
 
 				return (double)data;
 			}
-			set {
+			set
+			{
 				Debug.Assert(DataType == FsmReader.DataType.Float);
 
 				if ((double)data != value) {
@@ -222,6 +207,8 @@ namespace FsmReader {
 			}
 		}
 
+		public byte SaveVersion { get; private set; }
+
 		#endregion
 
 		private void FirePropertyChanged(string propertyName) {
@@ -230,15 +217,19 @@ namespace FsmReader {
 			}
 		}
 
-		public Treenode this[int index] {
-			get {
+		public Treenode this[int index]
+		{
+			get
+			{
 				if (index >= NodeChildren.Count) return null;
 				return NodeChildren[index];
 			}
 		}
 
-		public Treenode this[string childName] {
-			get {
+		public Treenode this[string childName]
+		{
+			get
+			{
 				Treenode ret = NodeChildren.FirstOrDefault(s => s.Title == childName);
 				if (ret != null) {
 					return ret;
@@ -305,7 +296,7 @@ namespace FsmReader {
 				//        }
 				//    }
 				//}
-				
+
 				return root;
 			} catch {
 				throw new Exception("File appears to be corrupt");
@@ -320,15 +311,35 @@ namespace FsmReader {
 			Treenode ret = new Treenode();
 			nodeArray.Add(count++, ret);
 
-			ret.Version = reader.ReadByte();
-			ret.Flags = (Flags)Enum.ToObject(typeof(DataType), reader.ReadByte());
+			// from linklist.h
+			// static char treefileloadversion;
+			// static char treefilesaveversion;
+			// byteblock name;
 
-			int len = reader.ReadInt32();
-			if (len > 0) {
-				ret.Title = new string(reader.ReadChars((int)len)).Replace("\0", "");
+			ret.LoadVersion = reader.ReadByte();
+			ret.SaveVersion = reader.ReadByte();
+
+			// byteblock - this may just be a int32 followed by a string
+			ulong byteBlockSize = (((ulong) reader.ReadInt32() << sizeof(Int32)) | (ulong)(long) reader.ReadInt32());
+
+			//ret.Flags = (Flags)Enum.ToObject(typeof(Flags), reader.ReadByte());
+
+			if (byteBlockSize > 0) {
+				ret.Title = reader.ReadNullTerminatedString((int) byteBlockSize);
 			}
 
-			ret.DataType = (DataType)Enum.ToObject(typeof(DataType), reader.ReadUInt32());
+			if (ret.SaveVersion == 1) {
+				double value = reader.ReadDouble();
+			} else if (ret.SaveVersion == 2) {
+				int stringLength = reader.ReadInt32();
+
+				ret.Data = reader.ReadNullTerminatedString(stringLength);
+
+				// String node
+				Console.WriteLine();
+			} else {
+				throw new NotImplementedException();
+			}
 
 			ret.Branch = (byte)reader.ReadUInt32();
 
@@ -345,10 +356,10 @@ namespace FsmReader {
 			}
 
 			if (ret.DataType == DataType.ByteBlock) {
-				len = reader.ReadInt32();
-				if (len > 0) {
-					byte[] buf = new byte[len];
-					reader.Read(buf, 0, len);
+				int byteBlockLength = reader.ReadInt32();
+				if (byteBlockLength > 0) {
+					byte[] buf = new byte[byteBlockLength];
+					reader.Read(buf, 0, byteBlockLength);
 
 					ret.data = Encoding.UTF8.GetString(buf).Replace("\0", "");
 				}
@@ -412,7 +423,7 @@ namespace FsmReader {
 		public static void Write(Treenode root, Stream file) {
 			BinaryWriter writer = new BinaryWriter(file);
 
-			writer.Write(root.Version);
+			writer.Write(root.LoadVersion);
 			writer.Write((byte)root.Flags);
 
 			writer.Write(root.Title.Length + 1);
@@ -484,17 +495,17 @@ namespace FsmReader {
 		public event PropertyChangedEventHandler PropertyChanged;
 
 
-        public static void PrintTree(Treenode t, Stream s) {
-            using (StreamWriter sw = new StreamWriter(s)) {
-                _PrintTree(t, sw);
-            }
-        }
+		public static void PrintTree(Treenode t, Stream s) {
+			using (StreamWriter sw = new StreamWriter(s)) {
+				_PrintTree(t, sw);
+			}
+		}
 
-        private static void _PrintTree(Treenode t, StreamWriter sw) {
-            sw.WriteLine(t.FullPath + " " + t.DataAsString);
-            foreach (Treenode child in t.Children) {
-                _PrintTree(child, sw);
-            }
-        }
-    }
+		private static void _PrintTree(Treenode t, StreamWriter sw) {
+			sw.WriteLine(t.FullPath + " " + t.DataAsString);
+			foreach (Treenode child in t.Children) {
+				_PrintTree(child, sw);
+			}
+		}
+	}
 }
