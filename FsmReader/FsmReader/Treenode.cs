@@ -21,19 +21,7 @@ namespace FsmReader {
 		private Treenode dataSizeNode;
 
 		#region Properties
-		private byte _Version;
-
-		/// <summary>
-		/// Unsure - Seen 0x42 on stringnode.t.unzipped and 0xc2 on doublenode.t.unzipped
-		/// </summary>
-		public byte LoadVersion
-		{
-			get { return _Version; }
-			set
-			{
-				_Version = value;
-			}
-		}
+		private Flags _Version;
 
 		private string title = "";
 		public string Title
@@ -207,7 +195,10 @@ namespace FsmReader {
 			}
 		}
 
-		public byte SaveVersion { get; private set; }
+		/// <summary>
+		/// This appears to be the datatype
+		/// </summary>
+		public byte NodeType { get; private set; }
 
 		#endregion
 
@@ -275,160 +266,112 @@ namespace FsmReader {
 
 			SortedList<int, Treenode> nodeArray = new SortedList<int, Treenode>();
 			// Load the tree
-			try {
-				Treenode root = _Read(stream, ref count, couplings, nodeArray);
 
-				Console.WriteLine("Read " + count + " nodes");
+			Treenode root = _Read(stream, -1);
 
-				// Connect the couplings
-				// May need to check bi-directionality of these
-				//foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
-				//    Treenode target = nodeArray[kv.Key];
+			Console.WriteLine("Read " + count + " nodes");
 
-				//    if (target != null) {
-				//        foreach (Treenode source in kv.Value) {
-				//            source.data = target;
-				//        }
-				//    } else {
-				//        Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
-				//        foreach (Treenode source in kv.Value) {
-				//            Console.WriteLine(source.FullPath);
-				//        }
-				//    }
-				//}
+			// Connect the couplings
+			// May need to check bi-directionality of these
+			//foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
+			//    Treenode target = nodeArray[kv.Key];
 
-				return root;
-			} catch {
-				throw new Exception("File appears to be corrupt");
-			}
+			//    if (target != null) {
+			//        foreach (Treenode source in kv.Value) {
+			//            source.data = target;
+			//        }
+			//    } else {
+			//        Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
+			//        foreach (Treenode source in kv.Value) {
+			//            Console.WriteLine(source.FullPath);
+			//        }
+			//    }
+			//}
 
-			return null;
+			return root;
 		}
 
-		private static Treenode _Read(Stream stream, ref int count, SortedList<int, List<Treenode>> couplings, SortedList<int, Treenode> nodeArray) {
+
+
+		private static Treenode _Read(Stream stream, int remainingChildren) {
 			BinaryReader reader = new BinaryReader(stream);
 
 			Treenode ret = new Treenode();
-			nodeArray.Add(count++, ret);
 
 			// from linklist.h
 			// static char treefileloadversion;
 			// static char treefilesaveversion;
 			// byteblock name;
 
-			ret.LoadVersion = reader.ReadByte();
-			ret.SaveVersion = reader.ReadByte();
+			ret.Flags = (Flags)reader.ReadByte();
+			ret.NodeType = reader.ReadByte();
 
-			// byteblock - this may just be a int32 followed by a string
-			ulong byteBlockSize = (((ulong) reader.ReadInt32() << sizeof(Int32)) | (ulong)(long) reader.ReadInt32());
+			if ((ret.Flags & Flags.FlagsExtended) == Flags.FlagsExtended) {
+				ret.FlagsExtended = (FlagsExtended)reader.ReadInt32();
+			}
+
+			int byteBlockSize = reader.ReadInt32();
 
 			//ret.Flags = (Flags)Enum.ToObject(typeof(Flags), reader.ReadByte());
 
 			if (byteBlockSize > 0) {
-				ret.Title = reader.ReadNullTerminatedString((int) byteBlockSize);
+				ret.Title = reader.ReadNullTerminatedString((int)byteBlockSize);
 			}
 
-			if (ret.SaveVersion == 1) {
+			if (ret.NodeType == 1) {
 				double value = reader.ReadDouble();
-			} else if (ret.SaveVersion == 2) {
+			} else if (ret.NodeType == 2) {
 				int stringLength = reader.ReadInt32();
 
 				ret.Data = reader.ReadNullTerminatedString(stringLength);
 
 				// String node
 				Console.WriteLine();
+			} else if (ret.NodeType == 4) {
+				// Object node
+				Treenode dummynode = _Read(stream, 1);
+
+				// The number of object children access with > rather then the normal +
+				int numChildren = reader.ReadInt32();
+
+				while (numChildren > 0) {
+					Treenode child = _Read(stream, numChildren);
+					numChildren--;
+
+					ret.DataChildren.Add(child);
+				}
+
+			} else if (ret.NodeType == 0) {
+				// Do nothing
 			} else {
 				throw new NotImplementedException();
 			}
 
-			ret.Branch = (byte)reader.ReadUInt32();
+			if ((ret.Flags & Flags.FlagsExtendedA) == Flags.FlagsExtendedA) {
+				Treenode dummynode = _Read(stream, 1);
 
-			if ((ret.Flags & Flags.FlagsExtended) == Flags.FlagsExtended) {
-				ret.FlagsExtended = (FlagsExtended)Enum.ToObject(typeof(FlagsExtended), reader.ReadUInt32());
-			}
+				int numChildren = reader.ReadInt32();
 
-			if ((ret.FlagsExtended & FlagsExtended.ODTDerivative) == FlagsExtended.ODTDerivative) {
-				ret.CppType = reader.ReadUInt32();
-			}
+				while(numChildren > 0) {
+					Treenode child = _Read(stream, numChildren);
+					numChildren--;
 
-			if ((ret.FlagsExtended & FlagsExtended.IndexCache) == FlagsExtended.IndexCache) {
-				ret.IndexCache = reader.ReadUInt32();
-			}
-
-			if (ret.DataType == DataType.ByteBlock) {
-				int byteBlockLength = reader.ReadInt32();
-				if (byteBlockLength > 0) {
-					byte[] buf = new byte[byteBlockLength];
-					reader.Read(buf, 0, byteBlockLength);
-
-					ret.data = Encoding.UTF8.GetString(buf).Replace("\0", "");
-				}
-			} else if (ret.DataType == DataType.Float) {
-				ret.data = reader.ReadDouble();
-			} else if (ret.DataType == DataType.PointerCoupling) {
-				int targetNumber = (int)reader.ReadUInt32();
-				ret.data = targetNumber;
-
-				if (targetNumber > 0) {
-					if (couplings.ContainsKey(targetNumber)) {
-						couplings[targetNumber].Add(ret);
-					} else {
-						couplings.Add(targetNumber, new List<Treenode>() { ret });
-					}
+					ret.NodeChildren.Add(child);
 				}
 			}
 
-			if (ret.Branch > 0) {
-				ret.childSizeNode = _Read(stream, ref count, couplings, nodeArray);
-
-				uint dataNodesToRead = ret.childSizeNode.Size;
-
-				while (dataNodesToRead-- > 0) {
-					Treenode node = _Read(stream, ref count, couplings, nodeArray);
-					node.Parent = ret;
-
-					if (ret.DataType == DataType.Object) {
-						ret.DataChildren.Add(node);
-					} else {
-						ret.NodeChildren.Add(node);
-					}
-				}
-			}
-
-			if (ret.DataType == DataType.Object) {
-				ret.dataSizeNode = _Read(stream, ref count, couplings, nodeArray);
-
-				uint nodesToRead = ret.dataSizeNode.Size;
-
-				while (nodesToRead-- > 0) {
-					Treenode node = _Read(stream, ref count, couplings, nodeArray);
-					node.Parent = ret;
-
-					if (ret.Branch > 0) {
-						ret.NodeChildren.Add(node);
-					} else {
-						ret.DataChildren.Add(node);
-					}
-				}
-			} else if (ret.DataType == DataType.Particle) {
-				Console.WriteLine("ERROR: Unknown datatype: " + ret.DataType.ToString() + " at " + stream.Position);
-			}
-
-			if ((ret.Flags & Flags.HasOwner) != Flags.HasOwner) {
-				ret.Size = reader.ReadUInt32();
-			}
 			return ret;
+
 		}
 
 		public static void Write(Treenode root, Stream file) {
 			BinaryWriter writer = new BinaryWriter(file);
 
-			writer.Write(root.LoadVersion);
 			writer.Write((byte)root.Flags);
+			writer.Write((byte)root.FlagsExtended);
 
 			writer.Write(root.Title.Length + 1);
 			writer.Write(Encoding.ASCII.GetBytes(root.Title + '\0'));
-
 
 			writer.Write((uint)root.DataType);
 
