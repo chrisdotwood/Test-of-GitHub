@@ -344,7 +344,8 @@ namespace TreeViewer.ViewModels {
        
 		private void NextDifferenceCommandBinding_Executed(object sender) {
 			if (nextDiffSearch == null) {
-				nextDiffSearch = new DepthFirstSearch(TreenodeViewModel.GetTreenode(LeftFsmTree.RootNode));
+				TreenodeViewModel startNode = LeftFsmTree.SelectedItem ?? LeftFsmTree.RootNode;
+				nextDiffSearch = new DepthFirstSearch(TreenodeViewModel.GetTreenode(startNode));
 				
 			}
 			bool result = false;
@@ -358,25 +359,25 @@ namespace TreeViewer.ViewModels {
 					if (other != null) {
 						RightFsmTree.SelectNode(other);
 						
-						try {
-							TextDiffTool diff = new TextDiffTool(Properties.Settings.Default.DiffToolPath);
+						//try {
+						//	TextDiffTool diff = new TextDiffTool(Properties.Settings.Default.DiffToolPath);
 
-							string tmpl = Path.GetTempFileName();
-							string tmpr = Path.GetTempFileName();
+						//	string tmpl = Path.GetTempFileName();
+						//	string tmpr = Path.GetTempFileName();
 
-							using (StreamWriter sw = new StreamWriter(tmpl)) {
-								sw.WriteLine(LeftFsmTree.SelectedItem.DataAsString);
-								sw.Flush();
-							}
-							using (StreamWriter sw = new StreamWriter(tmpr)) {
-								sw.WriteLine(RightFsmTree.SelectedItem.DataAsString);
-								sw.Flush();
-							}
+						//	using (StreamWriter sw = new StreamWriter(tmpl)) {
+						//		sw.WriteLine(LeftFsmTree.SelectedItem.DataAsString);
+						//		sw.Flush();
+						//	}
+						//	using (StreamWriter sw = new StreamWriter(tmpr)) {
+						//		sw.WriteLine(RightFsmTree.SelectedItem.DataAsString);
+						//		sw.Flush();
+						//	}
 
-							List<Change> changes = diff.Diff(tmpl, tmpr);
-						} catch (Exception ex) {
-							MessageBox.Show("Error generating diff: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						}
+						//	List<Change> changes = diff.Diff(tmpl, tmpr);
+						//} catch (Exception ex) {
+						//	MessageBox.Show("Error generating diff: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+						//}
 					}
 				}
 

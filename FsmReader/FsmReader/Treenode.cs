@@ -13,16 +13,13 @@ namespace FsmReader {
 
 	public class Treenode : Composite, INotifyPropertyChanged {
 		#region Properties
-		
+
 		private string title = "";
-		public string Title
-		{
-			get
-			{
+		public string Title {
+			get {
 				return title;
 			}
-			set
-			{
+			set {
 				if (value != title) {
 					title = value;
 					FirePropertyChanged("Title");
@@ -32,14 +29,11 @@ namespace FsmReader {
 		private object data;
 
 		private DataType dataType;
-		public DataType DataType
-		{
-			get
-			{
+		public DataType DataType {
+			get {
 				return dataType;
 			}
-			set
-			{
+			set {
 				if (value != dataType) {
 					dataType = value;
 					FirePropertyChanged("DataType");
@@ -48,14 +42,11 @@ namespace FsmReader {
 		}
 
 		private Flags flags = Flags.ExtendedFlags;
-		public Flags Flags
-		{
-			get
-			{
+		public Flags Flags {
+			get {
 				return flags;
 			}
-			set
-			{
+			set {
 				if (value != flags) {
 					flags = value;
 					FirePropertyChanged("Flags");
@@ -64,14 +55,11 @@ namespace FsmReader {
 		}
 
 		private FlagsExtended flagsExtended;
-		public FlagsExtended FlagsExtended
-		{
-			get
-			{
+		public FlagsExtended FlagsExtended {
+			get {
 				return flagsExtended;
 			}
-			set
-			{
+			set {
 				if (value != flagsExtended) {
 					flagsExtended = value;
 					FirePropertyChanged("FlagsExtended");
@@ -89,27 +77,21 @@ namespace FsmReader {
 
 		private List<Treenode> _NodeChildren = new List<Treenode>();
 
-		public IEnumerable<Treenode> NodeChildren
-		{
-			get
-			{
+		public IEnumerable<Treenode> NodeChildren {
+			get {
 				return _NodeChildren;
 			}
 		}
 
 		private List<Treenode> _DataChildren = new List<Treenode>();
-		public IEnumerable<Treenode> DataChildren
-		{
-			get
-			{
+		public IEnumerable<Treenode> DataChildren {
+			get {
 				return _DataChildren;
 			}
 		}
 
-		public override ReadOnlyCollection<Composite> Children
-		{
-			get
-			{
+		public override ReadOnlyCollection<Composite> Children {
+			get {
 				List<Composite> c = DataChildren.ToList<Composite>();
 				c.AddRange(NodeChildren);
 
@@ -120,10 +102,8 @@ namespace FsmReader {
 
 		public Treenode Parent;
 
-		public string FullPath
-		{
-			get
-			{
+		public string FullPath {
+			get {
 				string path = "/" + Title;
 
 				Treenode up = Parent;
@@ -135,14 +115,11 @@ namespace FsmReader {
 			}
 		}
 
-		public object Data
-		{
-			get
-			{
+		public object Data {
+			get {
 				return data;
 			}
-			set
-			{
+			set {
 				if (value != data) {
 					data = value;
 					FirePropertyChanged("Data");
@@ -152,18 +129,15 @@ namespace FsmReader {
 			}
 		}
 
-		public string DataAsString
-		{
-			get
-			{
+		public string DataAsString {
+			get {
 				if (data != null) {
 					return data.ToString();
 				} else {
 					return "";
 				}
 			}
-			set
-			{
+			set {
 				Debug.Assert(DataType == FsmReader.DataType.ByteBlock);
 
 				if ((string)data != value) {
@@ -173,16 +147,13 @@ namespace FsmReader {
 			}
 		}
 
-		public double DataAsDouble
-		{
-			get
-			{
+		public double DataAsDouble {
+			get {
 				Debug.Assert(DataType == FsmReader.DataType.Float);
 
 				return (double)data;
 			}
-			set
-			{
+			set {
 				Debug.Assert(DataType == FsmReader.DataType.Float);
 
 				if ((double)data != value) {
@@ -200,19 +171,15 @@ namespace FsmReader {
 			}
 		}
 
-		public Treenode this[int index]
-		{
-			get
-			{
+		public Treenode this[int index] {
+			get {
 				if (index >= _NodeChildren.Count) return null;
 				return _NodeChildren[index];
 			}
 		}
 
-		public Treenode this[string childName]
-		{
-			get
-			{
+		public Treenode this[string childName] {
+			get {
 				Treenode ret = NodeChildren.FirstOrDefault(s => s.Title == childName);
 				if (ret != null) {
 					return ret;
