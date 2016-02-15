@@ -56,7 +56,7 @@ namespace FsmReader {
 			}
 		}
 
-		private Flags flags = Flags.FlagsExtended;
+		private Flags flags = Flags.ExtendedFlags;
 		public Flags Flags
 		{
 			get
@@ -196,9 +196,9 @@ namespace FsmReader {
 		}
 
 		/// <summary>
-		/// This appears to be the datatype
+		/// The type of the data stored on this node
 		/// </summary>
-		public byte NodeType { get; private set; }
+		public DataType NodeType { get; private set; }
 
 		#endregion
 
@@ -259,7 +259,7 @@ namespace FsmReader {
 		#region Serialisation
 
 		public static Treenode Read(Stream stream) {
-			int count = -1;
+			int count = 0;
 
 			// Key is node number of target, value is source
 			SortedList<int, List<Treenode>> couplings = new SortedList<int, List<Treenode>>();
@@ -267,7 +267,7 @@ namespace FsmReader {
 			SortedList<int, Treenode> nodeArray = new SortedList<int, Treenode>();
 			// Load the tree
 
-			Treenode root = _Read(stream, -1);
+			Treenode root = _Read(stream, ref count);
 
 			Console.WriteLine("Read " + count + " nodes");
 
@@ -293,7 +293,7 @@ namespace FsmReader {
 
 
 
-		private static Treenode _Read(Stream stream, int remainingChildren) {
+		private static Treenode _Read(Stream stream, ref int count) {
 			BinaryReader reader = new BinaryReader(stream);
 
 			Treenode ret = new Treenode();
@@ -303,57 +303,78 @@ namespace FsmReader {
 			// static char treefilesaveversion;
 			// byteblock name;
 
-			ret.Flags = (Flags)reader.ReadByte();
-			ret.NodeType = reader.ReadByte();
+			count++;
 
-			if ((ret.Flags & Flags.FlagsExtended) == Flags.FlagsExtended) {
+			ret.Flags = (Flags)reader.ReadByte();
+			ret.NodeType = (DataType)reader.ReadByte();
+
+			if ((ret.Flags & Flags.ExtendedFlags) == Flags.ExtendedFlags) {
 				ret.FlagsExtended = (FlagsExtended)reader.ReadInt32();
 			}
 
 			int byteBlockSize = reader.ReadInt32();
 
-			//ret.Flags = (Flags)Enum.ToObject(typeof(Flags), reader.ReadByte());
-
 			if (byteBlockSize > 0) {
 				ret.Title = reader.ReadNullTerminatedString((int)byteBlockSize);
 			}
 
-			if (ret.NodeType == 1) {
+			byte[] u = new byte[] { 0x40, 0, 0, 0, 0, 0 };
+
+			if (ret.NodeType == DataType.Float) {
 				double value = reader.ReadDouble();
-			} else if (ret.NodeType == 2) {
+			} else if (ret.NodeType == DataType.ByteBlock) {
 				int stringLength = reader.ReadInt32();
 
 				ret.Data = reader.ReadNullTerminatedString(stringLength);
+			} else if (ret.NodeType == DataType.Object) {
+				byte[] unknown = reader.ReadBytes(6);
 
-				// String node
-				Console.WriteLine();
-			} else if (ret.NodeType == 4) {
-				// Object node
-				Treenode dummynode = _Read(stream, 1);
+				for (int i = 0; i < 6; i++) {
+					if (unknown[i] != u[i]) {
+						Console.WriteLine();
+					}
+				}
+
+				// Skip over the next bytesToJump bytes. Not sure why yet.
+				int bytesToJump = reader.ReadInt32();
+				byte[] jumped = reader.ReadBytes(bytesToJump);
 
 				// The number of object children access with > rather then the normal +
 				int numChildren = reader.ReadInt32();
 
 				while (numChildren > 0) {
-					Treenode child = _Read(stream, numChildren);
+					Treenode child = _Read(stream, ref count);
 					numChildren--;
 
 					ret.DataChildren.Add(child);
 				}
 
-			} else if (ret.NodeType == 0) {
+			} else if (ret.NodeType == DataType.None) {
 				// Do nothing
+			} else if (ret.NodeType == DataType.PointerCoupling) {
+				int coupling = reader.ReadInt32();
 			} else {
-				throw new NotImplementedException();
+				//throw new NotImplementedException();
 			}
 
-			if ((ret.Flags & Flags.FlagsExtendedA) == Flags.FlagsExtendedA) {
-				Treenode dummynode = _Read(stream, 1);
+			if ((ret.Flags & Flags.HasBranch) == Flags.HasBranch) {
+				byte[] unknown = reader.ReadBytes(6);
 
+				for (int i = 0; i < 6; i++) {
+					if (unknown[i] != u[i]) {
+						Console.WriteLine();
+					}
+				}
+
+				// Skip over the next bytesToJump bytes. Not sure why yet.
+				int bytesToJump = reader.ReadInt32();
+				byte[] jumped = reader.ReadBytes(bytesToJump);
+
+				// The number of object children access with the normal +
 				int numChildren = reader.ReadInt32();
 
-				while(numChildren > 0) {
-					Treenode child = _Read(stream, numChildren);
+				while (numChildren > 0) {
+					Treenode child = _Read(stream, ref count);
 					numChildren--;
 
 					ret.NodeChildren.Add(child);
@@ -377,7 +398,7 @@ namespace FsmReader {
 
 			writer.Write((uint)root.Branch);
 
-			if ((root.Flags & Flags.FlagsExtended) == Flags.FlagsExtended) {
+			if ((root.Flags & Flags.ExtendedFlags) == Flags.ExtendedFlags) {
 				writer.Write((uint)root.FlagsExtended);
 			}
 

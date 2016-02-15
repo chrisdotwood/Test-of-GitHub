@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using ComparisonTools;
+using System.IO.Compression;
 
 namespace TreeViewer.ViewModels {
     public class TreeDiffControlViewModel : ViewModelBase {
@@ -92,8 +93,16 @@ namespace TreeViewer.ViewModels {
             try {
                 Treenode root = null;
 
-                using (FileStream stream = new FileStream(arg.Path, FileMode.Open)) {
-                    root = Treenode.Read(stream);
+                using (FileStream stream = new FileStream(arg.Path, FileMode.Open, FileAccess.Read)) {
+					// TODO Validate preamble
+					// Skip the first 0x48 bytes
+					stream.Position = 0x48;
+
+					using (GZipStream zipStream = new GZipStream(stream, CompressionMode.Decompress)) {
+						//using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\doublenode.t.unzipped", FileMode.Open)) {
+						root = Treenode.Read(zipStream);
+					}
+
                 }
 
                 if (root != null) {

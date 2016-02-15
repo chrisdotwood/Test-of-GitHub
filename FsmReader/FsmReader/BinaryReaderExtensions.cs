@@ -6,7 +6,7 @@ using System.Text;
 
 namespace FsmReader {
 	public static class BinaryReaderExtensions {
-		public const int MaxStringLength = 10000;
+		public const int MaxStringLength = 100000;
 
 		/// <summary>
 		/// Read a null terminated string from this BinaryReader.
@@ -21,11 +21,10 @@ namespace FsmReader {
 
 			string nullTerminatedString = new string(reader.ReadChars(length));
 
-			if (!nullTerminatedString.EndsWith("\0")) {
-				throw new InvalidDataException("Null terminated string doesn't end with a 0x0");
+			if(nullTerminatedString.Length != length) {
+				throw new InvalidDataException("Length of string didn't match that specified");
 			}
-
-			return nullTerminatedString.Substring(0, nullTerminatedString.Length - 1);
+			return nullTerminatedString.TrimEnd(new char[] { '\0' });
 		}
 	}
 }

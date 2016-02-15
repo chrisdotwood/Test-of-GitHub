@@ -9,6 +9,7 @@ namespace FsmReader {
 	/// Values taken from Flexsim C:\Program Files (x86)\Flexsim5\program\system\include\linklist.h
 	/// </summary>
 	public enum DataType : byte {
+		None = 0,
 		Float = 1,
 		ByteBlock = 2,
 		PointerCoupling = 3,
@@ -26,8 +27,8 @@ namespace FsmReader {
 		Selected = 0x08,
 		HideConnectors = 0x10,
 		HideLabel = 0x20,
-		FlagsExtended = 0x40,
-		FlagsExtendedA = 0x80
+		ExtendedFlags = 0x40,
+		HasBranch = 0x80
 	}
 
 	[Flags]
