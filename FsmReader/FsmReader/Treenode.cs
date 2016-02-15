@@ -196,11 +196,6 @@ namespace FsmReader {
 			}
 		}
 
-		/// <summary>
-		/// The type of the data stored on this node
-		/// </summary>
-		public DataType NodeType { get; private set; }
-
 		#endregion
 
 		private void FirePropertyChanged(string propertyName) {
@@ -299,15 +294,10 @@ namespace FsmReader {
 
 			Treenode ret = new Treenode();
 
-			// from linklist.h
-			// static char treefileloadversion;
-			// static char treefilesaveversion;
-			// byteblock name;
-
 			count++;
 
 			ret.Flags = (Flags)reader.ReadByte();
-			ret.NodeType = (DataType)reader.ReadByte();
+			ret.DataType = (DataType)reader.ReadByte();
 
 			if ((ret.Flags & Flags.ExtendedFlags) == Flags.ExtendedFlags) {
 				ret.FlagsExtended = (FlagsExtended)reader.ReadInt32();
@@ -319,31 +309,15 @@ namespace FsmReader {
 				ret.Title = reader.ReadNullTerminatedString((int)byteBlockSize);
 			}
 
-			if(ret.title == "cranekinematics") {
-				Console.WriteLine();
-			}
-
-			byte[] u = new byte[] { 0x40, 0, 0, 0, 0, 0 };
-
-			if (ret.NodeType == DataType.Float) {
+			if (ret.DataType == DataType.Float) {
 				double value = reader.ReadDouble();
-			} else if (ret.NodeType == DataType.ByteBlock) {
+			} else if (ret.DataType == DataType.ByteBlock) {
 				int stringLength = reader.ReadInt32();
 
 				ret.Data = reader.ReadNullTerminatedString(stringLength);
-			} else if (ret.NodeType == DataType.Object) {
+			} else if (ret.DataType == DataType.Object) {
+				// TODO Still don't know the purpose of this node
 				Treenode node = _Read(stream, ref count);
-
-				//byte[] unknown = reader.ReadBytes(6);
-
-				//for (int i = 0; i < 6; i++) {
-				//	if (unknown[i] != u[i]) {
-				//		Console.WriteLine();
-				//	}
-				//}
-
-				//int bytesToJump = reader.ReadInt32();
-				//ret.Data = reader.ReadNullTerminatedString(bytesToJump);
 
 				// The number of object children access with > rather then the normal +
 				int numChildren = reader.ReadInt32();
@@ -354,46 +328,21 @@ namespace FsmReader {
 
 					ret.AddDataChild(child);
 				}
-
-			} else if (ret.NodeType == DataType.None) {
+			} else if (ret.DataType == DataType.None || ret.DataType == DataType.Undefined) {
 				// Do nothing
-			} else if (ret.NodeType == DataType.PointerCoupling) {
+			} else if (ret.DataType == DataType.PointerCoupling) {
 				int coupling = reader.ReadInt32();
 			} else {
-				//throw new NotImplementedException();
-				Console.WriteLine();
+				throw new Exception("Data type was not recognised");
 			}
 
 			if ((ret.Flags & Flags.HasBranch) == Flags.HasBranch) {
+				// TODO Still don't know the purpose of this node
 				Treenode node = _Read(stream, ref count);
-				//byte[] unknown = reader.ReadBytes(6);
 
-				//for (int i = 0; i < 6; i++) {
-				//	if (unknown[i] != u[i]) {
-				//		Console.WriteLine();
-				//	}
-				//}
-
-				//// Skip over the next bytesToJump bytes. Not sure why yet.
-				//int bytesToJump = reader.ReadInt32();
-				//byte[] jumped = reader.ReadBytes(bytesToJump);
-
-				//int numChildren;
-
-				//if (unknown[1] == 0x02) {
-				//	byte[] unknownCppTail = reader.ReadBytes(0x9);
-
-				//	numChildren = 0;
-				//} else {
-				//	// The number of object children access with the normal +
-					int numChildren = reader.ReadInt32();
-				//}
+				int numChildren = reader.ReadInt32();
 
 				while (numChildren > 0) {
-					if(ret.Title == "model" && numChildren == 1) {
-						Console.WriteLine();
-					}
-
 					Treenode child = _Read(stream, ref count);
 					numChildren--;
 
@@ -402,7 +351,6 @@ namespace FsmReader {
 			}
 
 			return ret;
-
 		}
 
 		private void AddDataChild(Treenode child) {
