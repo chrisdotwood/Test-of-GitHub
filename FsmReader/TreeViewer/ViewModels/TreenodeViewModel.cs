@@ -6,13 +6,13 @@ using System.Linq;
 using SmartWeakEvent;
 using System.Windows;
 using System;
+using System.IO;
 
 namespace TreeViewer {
 	public class TreenodeViewModel : ViewModelBase {
 		private ObservableCollection<TreenodeViewModel> children = new ObservableCollection<TreenodeViewModel>();
 		private Treenode Treenode { get; set; }
 		public TreenodeViewModel Parent { get; set; }
-
 		public TreenodeViewModel(Treenode node, TreenodeViewModel parent) {
 			this.Treenode = node;
 			// TODO Ensure that TreenodeViews are destroyed when the Treenodes are in existance but the containing TreeView isn't
@@ -200,8 +200,8 @@ namespace TreeViewer {
 			return Treenode == node;
 		}
 
-		internal static void Write(TreenodeViewModel SelectedItem, System.IO.FileStream fs) {
-			Treenode.Write(SelectedItem.Treenode, fs);
+		internal static void Write(TreenodeViewModel rootNode, FileStream fs) {
+			throw new NotImplementedException();
 		}
 	}
 }

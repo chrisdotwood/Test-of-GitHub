@@ -12,12 +12,8 @@ namespace FsmReader {
 
 
 	public class Treenode : Composite, INotifyPropertyChanged {
-		private Treenode childSizeNode;
-		private Treenode dataSizeNode;
-
 		#region Properties
-		private Flags _Version;
-
+		
 		private string title = "";
 		public string Title
 		{
@@ -363,79 +359,9 @@ namespace FsmReader {
 			child.Parent = this;
 		}
 
-		public static void Write(Treenode root, Stream file) {
-			BinaryWriter writer = new BinaryWriter(file);
-
-			writer.Write((byte)root.Flags);
-			writer.Write((byte)root.FlagsExtended);
-
-			writer.Write(root.Title.Length + 1);
-			writer.Write(Encoding.ASCII.GetBytes(root.Title + '\0'));
-
-			writer.Write((uint)root.DataType);
-
-			writer.Write((uint)root.Branch);
-
-			if ((root.Flags & Flags.ExtendedFlags) == Flags.ExtendedFlags) {
-				writer.Write((uint)root.FlagsExtended);
-			}
-
-			if ((root.FlagsExtended & FlagsExtended.ODTDerivative) == FlagsExtended.ODTDerivative) {
-				writer.Write((uint)root.CppType);
-			}
-
-			if ((root.FlagsExtended & FlagsExtended.IndexCache) == FlagsExtended.IndexCache) {
-				writer.Write((uint)root.IndexCache);
-			}
-
-			if (root.DataType == DataType.ByteBlock) {
-				string str = (string)root.data;
-
-				writer.Write(str.Length + 1);
-				writer.Write(Encoding.ASCII.GetBytes(str + '\0'));
-			} else if (root.DataType == DataType.Float) {
-				writer.Write((double)root.data);
-			} else if (root.DataType == DataType.PointerCoupling) {
-				writer.Write((uint)(int)root.data);
-			}
-
-			if (root.Branch > 0) {
-				IEnumerable<Treenode> children = root.DataType == DataType.Object ? root.DataChildren : root.NodeChildren;
-
-				root.childSizeNode.Size = (uint)children.Count();
-				Write(root.childSizeNode, file);
-
-				foreach (Treenode child in children) {
-					Treenode.Write(child, file);
-				}
-			}
-
-			if (root.DataType == DataType.Object) {
-				IEnumerable<Treenode> children;
-
-				if (root.Branch == 0) {
-					children = root.DataChildren;
-				} else {
-					children = root.NodeChildren;
-				}
-
-				root.dataSizeNode.Size = (uint)children.Count();
-				Write(root.dataSizeNode, file);
-
-				foreach (Treenode child in children) {
-					Treenode.Write(child, file);
-				}
-			}
-
-			if ((root.Flags & Flags.HasOwner) != Flags.HasOwner) {
-				writer.Write(root.Size);
-			}
-		}
-
 		#endregion
 
 		public event PropertyChangedEventHandler PropertyChanged;
-
 
 		public static void PrintTree(Treenode t, Stream s) {
 			using (StreamWriter sw = new StreamWriter(s)) {
