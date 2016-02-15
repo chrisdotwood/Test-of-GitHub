@@ -26,7 +26,6 @@ namespace FsmReader {
 				}
 			}
 		}
-		private object data;
 
 		private DataType dataType;
 		public DataType DataType {
@@ -115,13 +114,14 @@ namespace FsmReader {
 			}
 		}
 
-		public object Data {
+		private byte[] _Data;
+		public byte[] Data {
 			get {
-				return data;
+				return _Data;
 			}
-			set {
-				if (value != data) {
-					data = value;
+			private set {
+				if (value != _Data) {
+					_Data = value;
 					FirePropertyChanged("Data");
 					FirePropertyChanged("DataAsString");
 					FirePropertyChanged("DataAsDouble");
@@ -131,18 +131,17 @@ namespace FsmReader {
 
 		public string DataAsString {
 			get {
-				if (data != null) {
-					return data.ToString();
-				} else {
-					return "";
-				}
+				if (Data == null) return null;
+
+				return Encoding.ASCII.GetString(Data).TrimEnd(new char[] { '\0' });
 			}
 			set {
 				Debug.Assert(DataType == FsmReader.DataType.ByteBlock);
 
-				if ((string)data != value) {
-					data = value;
-					FirePropertyChanged("DataAsString");
+				if (value == null) {
+					Data = null;
+				} else {
+					Data = Encoding.ASCII.GetBytes(value);
 				}
 			}
 		}
@@ -150,16 +149,12 @@ namespace FsmReader {
 		public double DataAsDouble {
 			get {
 				Debug.Assert(DataType == FsmReader.DataType.Float);
-
-				return (double)data;
+				return BitConverter.ToDouble(Data, 0);
 			}
 			set {
 				Debug.Assert(DataType == FsmReader.DataType.Float);
 
-				if ((double)data != value) {
-					data = value;
-					FirePropertyChanged("DataAsDouble");
-				}
+				Data = BitConverter.GetBytes(value);
 			}
 		}
 
@@ -250,8 +245,6 @@ namespace FsmReader {
 			return root;
 		}
 
-
-
 		private static Treenode _Read(Stream stream, ref int count) {
 			BinaryReader reader = new BinaryReader(stream);
 
@@ -277,7 +270,7 @@ namespace FsmReader {
 			} else if (ret.DataType == DataType.ByteBlock) {
 				int stringLength = reader.ReadInt32();
 
-				ret.Data = reader.ReadNullTerminatedString(stringLength);
+				ret.Data = reader.ReadBytes(stringLength); //reader.ReadNullTerminatedString(stringLength);
 			} else if (ret.DataType == DataType.Object) {
 				// TODO Still don't know the purpose of this node
 				Treenode node = _Read(stream, ref count);

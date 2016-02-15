@@ -41,7 +41,6 @@ namespace TreeViewer {
 
 			this.DataContext = vm;
 		}
-
 		
 		private void UserControl_Loaded(object sender, RoutedEventArgs e) {
 			LeftCodeText.ScrollViewer.ScrollChanged += new ScrollChangedEventHandler(ScrollViewer_ScrollChanged);
@@ -57,7 +56,7 @@ namespace TreeViewer {
 	/// </summary>
 	public class TextToDocumentConvert : IValueConverter {
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
-			return new TextDocument(value as string);
+			return new TextDocument(value as string ?? string.Empty);
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
