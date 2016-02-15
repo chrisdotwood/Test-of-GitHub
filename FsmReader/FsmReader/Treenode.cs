@@ -319,6 +319,10 @@ namespace FsmReader {
 				ret.Title = reader.ReadNullTerminatedString((int)byteBlockSize);
 			}
 
+			if(ret.title == "cranekinematics") {
+				Console.WriteLine();
+			}
+
 			byte[] u = new byte[] { 0x40, 0, 0, 0, 0, 0 };
 
 			if (ret.NodeType == DataType.Float) {
@@ -328,16 +332,18 @@ namespace FsmReader {
 
 				ret.Data = reader.ReadNullTerminatedString(stringLength);
 			} else if (ret.NodeType == DataType.Object) {
-				byte[] unknown = reader.ReadBytes(6);
+				Treenode node = _Read(stream, ref count);
 
-				for (int i = 0; i < 6; i++) {
-					if (unknown[i] != u[i]) {
-						Console.WriteLine();
-					}
-				}
+				//byte[] unknown = reader.ReadBytes(6);
 
-				int bytesToJump = reader.ReadInt32();
-				ret.Data = reader.ReadNullTerminatedString(bytesToJump);
+				//for (int i = 0; i < 6; i++) {
+				//	if (unknown[i] != u[i]) {
+				//		Console.WriteLine();
+				//	}
+				//}
+
+				//int bytesToJump = reader.ReadInt32();
+				//ret.Data = reader.ReadNullTerminatedString(bytesToJump);
 
 				// The number of object children access with > rather then the normal +
 				int numChildren = reader.ReadInt32();
@@ -359,30 +365,35 @@ namespace FsmReader {
 			}
 
 			if ((ret.Flags & Flags.HasBranch) == Flags.HasBranch) {
-				byte[] unknown = reader.ReadBytes(6);
+				Treenode node = _Read(stream, ref count);
+				//byte[] unknown = reader.ReadBytes(6);
 
-				for (int i = 0; i < 6; i++) {
-					if (unknown[i] != u[i]) {
-						Console.WriteLine();
-					}
-				}
+				//for (int i = 0; i < 6; i++) {
+				//	if (unknown[i] != u[i]) {
+				//		Console.WriteLine();
+				//	}
+				//}
 
-				// Skip over the next bytesToJump bytes. Not sure why yet.
-				int bytesToJump = reader.ReadInt32();
-				byte[] jumped = reader.ReadBytes(bytesToJump);
+				//// Skip over the next bytesToJump bytes. Not sure why yet.
+				//int bytesToJump = reader.ReadInt32();
+				//byte[] jumped = reader.ReadBytes(bytesToJump);
 
-				int numChildren;
+				//int numChildren;
 
-				if (unknown[1] == 0x02) {
-					byte[] unknownCppTail = reader.ReadBytes(0x9);
+				//if (unknown[1] == 0x02) {
+				//	byte[] unknownCppTail = reader.ReadBytes(0x9);
 
-					numChildren = 0;
-				} else {
-					// The number of object children access with the normal +
-					numChildren = reader.ReadInt32();
-				}
+				//	numChildren = 0;
+				//} else {
+				//	// The number of object children access with the normal +
+					int numChildren = reader.ReadInt32();
+				//}
 
 				while (numChildren > 0) {
+					if(ret.Title == "model" && numChildren == 1) {
+						Console.WriteLine();
+					}
+
 					Treenode child = _Read(stream, ref count);
 					numChildren--;
 

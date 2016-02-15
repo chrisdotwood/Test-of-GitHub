@@ -13,7 +13,7 @@ namespace PrintFile {
 			Treenode root;
 
 			//using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\cppcodenode.t", FileMode.Open)) {
-			using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\Dose version 8.0.0.fsm", FileMode.Open)) {
+			using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\Dose version 8.0.0 minus SSCandC.fsm", FileMode.Open)) {
 				// TODO Validate preamble
 				// Skip the first 0x48 bytes
 				stream.Position = 0x48;

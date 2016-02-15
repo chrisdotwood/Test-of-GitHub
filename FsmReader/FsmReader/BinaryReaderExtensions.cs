@@ -19,12 +19,14 @@ namespace FsmReader {
 				Console.WriteLine("String is suspiciously long " + length + " bytes");
 			}
 
-			string nullTerminatedString = new string(reader.ReadChars(length));
+			byte[] data = reader.ReadBytes(length);
 
-			if(nullTerminatedString.Length != length) {
+			//string nullTerminatedString = new string(reader.ReadChars(length));
+
+			if (data.Length != length) {
 				throw new InvalidDataException("Length of string didn't match that specified");
 			}
-			return nullTerminatedString.TrimEnd(new char[] { '\0' });
+			return Encoding.ASCII.GetString(data).TrimEnd(new char[] { '\0' });
 		}
 	}
 }
