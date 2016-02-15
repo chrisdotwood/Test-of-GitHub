@@ -7,75 +7,38 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO.Compression;
 
 namespace FsmReader {
+	public class Treenode : Composite {
+		private static readonly char[] TrimChars = new char[] { '\0' };
 
-
-	public class Treenode : Composite, INotifyPropertyChanged {
 		#region Properties
 
-		private string title = "";
 		public string Title {
-			get {
-				return title;
-			}
-			set {
-				if (value != title) {
-					title = value;
-					FirePropertyChanged("Title");
-				}
-			}
+			get;
+			set;
 		}
 
-		private DataType dataType;
 		public DataType DataType {
-			get {
-				return dataType;
-			}
-			set {
-				if (value != dataType) {
-					dataType = value;
-					FirePropertyChanged("DataType");
-				}
-			}
+			get;
+			set;
 		}
 
-		private Flags flags = Flags.ExtendedFlags;
 		public Flags Flags {
-			get {
-				return flags;
-			}
-			set {
-				if (value != flags) {
-					flags = value;
-					FirePropertyChanged("Flags");
-				}
-			}
+			get;
+			set;
 		}
 
-		private FlagsExtended flagsExtended;
 		public FlagsExtended FlagsExtended {
-			get {
-				return flagsExtended;
-			}
-			set {
-				if (value != flagsExtended) {
-					flagsExtended = value;
-					FirePropertyChanged("FlagsExtended");
-				}
-			}
+			get;
+			set;
 		}
-
-		public byte Branch;
-
-		public uint IndexCache;
-
-		public uint CppType;
-
-		public uint Size;
 
 		private List<Treenode> _NodeChildren = new List<Treenode>();
-
+		/// <summary>
+		/// The child nodes that are accessed with the + symbol
+		/// </summary>
 		public IEnumerable<Treenode> NodeChildren {
 			get {
 				return _NodeChildren;
@@ -83,23 +46,28 @@ namespace FsmReader {
 		}
 
 		private List<Treenode> _DataChildren = new List<Treenode>();
+		/// <summary>
+		/// The child nodes that are accessed with the > symbol
+		/// </summary>
 		public IEnumerable<Treenode> DataChildren {
 			get {
 				return _DataChildren;
 			}
 		}
 
-		public override ReadOnlyCollection<Composite> Children {
+		/// <summary>
+		/// An aggregation of both the DataChildren and the NodeChildren. This is to enable searching etc. of the tree.
+		/// </summary>
+		public override IEnumerable<Composite> Children {
 			get {
-				List<Composite> c = DataChildren.ToList<Composite>();
-				c.AddRange(NodeChildren);
-
-				//TODO This needs to be implemented in a more performant manner
-				return new ReadOnlyCollection<Composite>(c);
+				return DataChildren.Union(NodeChildren);
 			}
 		}
 
-		public Treenode Parent;
+		public Treenode Parent {
+			get;
+			set;
+		}
 
 		public string FullPath {
 			get {
@@ -115,6 +83,9 @@ namespace FsmReader {
 		}
 
 		private byte[] _Data;
+		/// <summary>
+		/// The raw data that is associated with this node
+		/// </summary>
 		public byte[] Data {
 			get {
 				return _Data;
@@ -122,30 +93,24 @@ namespace FsmReader {
 			private set {
 				if (value != _Data) {
 					_Data = value;
-					FirePropertyChanged("Data");
-					FirePropertyChanged("DataAsString");
-					FirePropertyChanged("DataAsDouble");
 				}
 			}
 		}
 
+		/// <summary>
+		/// The raw node data converted to an ASCII string
+		/// </summary>
 		public string DataAsString {
 			get {
 				if (Data == null) return null;
 
-				return Encoding.ASCII.GetString(Data).TrimEnd(new char[] { '\0' });
-			}
-			set {
-				Debug.Assert(DataType == FsmReader.DataType.ByteBlock);
-
-				if (value == null) {
-					Data = null;
-				} else {
-					Data = Encoding.ASCII.GetBytes(value);
-				}
+				return Encoding.ASCII.GetString(Data).TrimEnd(TrimChars);
 			}
 		}
 
+		/// <summary>
+		/// The raw node data converted to a double
+		/// </summary>
 		public double DataAsDouble {
 			get {
 				Debug.Assert(DataType == FsmReader.DataType.Float);
@@ -159,19 +124,6 @@ namespace FsmReader {
 		}
 
 		#endregion
-
-		private void FirePropertyChanged(string propertyName) {
-			if (PropertyChanged != null) {
-				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-
-		public Treenode this[int index] {
-			get {
-				if (index >= _NodeChildren.Count) return null;
-				return _NodeChildren[index];
-			}
-		}
 
 		public Treenode this[string childName] {
 			get {
@@ -212,42 +164,70 @@ namespace FsmReader {
 
 		#region Serialisation
 
+		/// <summary>
+		/// Read the tree from a stream pointing to either a .t or a .fsm file. Flexsim 5.x format only.
+		/// </summary>
+		/// <param name="stream"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// The fsm file for Flexsim 5.x is 0x48 bytes of preamble followed by a gzipped serialised tree.
+		/// </remarks>
 		public static Treenode Read(Stream stream) {
-			int count = 0;
+			using (BinaryReader preambleReader = new BinaryReader(stream)) {
+				byte[] preamble = preambleReader.ReadBytes(0x48);
 
-			// Key is node number of target, value is source
-			SortedList<int, List<Treenode>> couplings = new SortedList<int, List<Treenode>>();
+				string magicText = "flexsimtree";
 
-			SortedList<int, Treenode> nodeArray = new SortedList<int, Treenode>();
-			// Load the tree
+				string fileMagicText = Encoding.ASCII.GetString(preamble, 0, magicText.Length);
 
-			Treenode root = _Read(stream, ref count);
+				if (magicText != fileMagicText) {
+					throw new Exception("File doesn't appear to be a valid Flexsim .t or .fsm file");
+				}
 
-			Console.WriteLine("Read " + count + " nodes");
+				byte fileVersion = preamble[0x1c];
 
-			// Connect the couplings
-			// May need to check bi-directionality of these
-			//foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
-			//    Treenode target = nodeArray[kv.Key];
+				// 5.x is 0x03. 7.7 is 0x04
+				if (fileVersion != 0x03) {
+					throw new Exception("Only Flexsim 5.x files are currently supported");
+				}
 
-			//    if (target != null) {
-			//        foreach (Treenode source in kv.Value) {
-			//            source.data = target;
-			//        }
-			//    } else {
-			//        Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
-			//        foreach (Treenode source in kv.Value) {
-			//            Console.WriteLine(source.FullPath);
-			//        }
-			//    }
-			//}
+				// Key is node number of target, value is source
+				SortedList<int, List<Treenode>> couplings = new SortedList<int, List<Treenode>>();
 
-			return root;
+				SortedList<int, Treenode> nodeArray = new SortedList<int, Treenode>();
+
+				// The remaining file is gzipped
+				using (GZipStream zipStream = new GZipStream(stream, CompressionMode.Decompress)) {
+					using (BinaryReader zipReader = new BinaryReader(zipStream)) {
+
+						int numberOfNodesRead = 0;
+
+						Treenode root = _Read(zipReader, ref numberOfNodesRead);
+
+						// TODO Connect the couplings
+						// May need to check bi-directionality of these
+						//foreach (KeyValuePair<int, List<Treenode>> kv in couplings) {
+						//    Treenode target = nodeArray[kv.Key];
+
+						//    if (target != null) {
+						//        foreach (Treenode source in kv.Value) {
+						//            source.data = target;
+						//        }
+						//    } else {
+						//        Console.WriteLine("WARNING: File may be corrupt. Target node not found for the following couplings:");
+						//        foreach (Treenode source in kv.Value) {
+						//            Console.WriteLine(source.FullPath);
+						//        }
+						//    }
+						//}
+
+						return root;
+					}
+				}
+			}
 		}
 
-		private static Treenode _Read(Stream stream, ref int count) {
-			BinaryReader reader = new BinaryReader(stream);
-
+		private static Treenode _Read(BinaryReader reader, ref int count) {
 			Treenode ret = new Treenode();
 
 			count++;
@@ -259,10 +239,10 @@ namespace FsmReader {
 				ret.FlagsExtended = (FlagsExtended)reader.ReadInt32();
 			}
 
-			int byteBlockSize = reader.ReadInt32();
+			int titleLength = reader.ReadInt32();
 
-			if (byteBlockSize > 0) {
-				ret.Title = reader.ReadNullTerminatedString((int)byteBlockSize);
+			if (titleLength > 0) {
+				ret.Title = Encoding.ASCII.GetString(reader.ReadBytes(titleLength)).TrimEnd(Treenode.TrimChars);
 			}
 
 			if (ret.DataType == DataType.Float) {
@@ -270,36 +250,44 @@ namespace FsmReader {
 			} else if (ret.DataType == DataType.ByteBlock) {
 				int stringLength = reader.ReadInt32();
 
-				ret.Data = reader.ReadBytes(stringLength); //reader.ReadNullTerminatedString(stringLength);
+				ret.Data = reader.ReadBytes(stringLength);
 			} else if (ret.DataType == DataType.Object) {
+				// If the node is an object then the next 4 bytes are an Int32 containing the
+				// number of child data nodes that it has (those accessed through the > symbol
+				// that is specific to objects). The next node to be read is the first of these
+				// which may itself have child nodes. This is how the tree is serialised.
+
 				// TODO Still don't know the purpose of this node
-				Treenode node = _Read(stream, ref count);
+				Treenode node = _Read(reader, ref count);
 
 				// The number of object children access with > rather then the normal +
 				int numChildren = reader.ReadInt32();
 
 				while (numChildren > 0) {
-					Treenode child = _Read(stream, ref count);
+					Treenode child = _Read(reader, ref count);
 					numChildren--;
 
 					ret.AddDataChild(child);
 				}
-			} else if (ret.DataType == DataType.None || ret.DataType == DataType.Undefined) {
-				// Do nothing
 			} else if (ret.DataType == DataType.PointerCoupling) {
 				int coupling = reader.ReadInt32();
+			} else if (ret.DataType == DataType.None || ret.DataType == DataType.Undefined) {
+				// Do nothing
 			} else {
 				throw new Exception("Data type was not recognised");
 			}
 
+			// If the HasBranch flag is set then this node is followed by an Int32 containing the
+			// number of child nodes that it has. The next node to be read is the first of these
+			// which may itself have child nodes. This is how the tree is serialised
 			if ((ret.Flags & Flags.HasBranch) == Flags.HasBranch) {
 				// TODO Still don't know the purpose of this node
-				Treenode node = _Read(stream, ref count);
+				Treenode node = _Read(reader, ref count);
 
 				int numChildren = reader.ReadInt32();
 
 				while (numChildren > 0) {
-					Treenode child = _Read(stream, ref count);
+					Treenode child = _Read(reader, ref count);
 					numChildren--;
 
 					ret.AddNodeChild(child);
@@ -320,8 +308,6 @@ namespace FsmReader {
 		}
 
 		#endregion
-
-		public event PropertyChangedEventHandler PropertyChanged;
 
 		public static void PrintTree(Treenode t, Stream s) {
 			using (StreamWriter sw = new StreamWriter(s)) {

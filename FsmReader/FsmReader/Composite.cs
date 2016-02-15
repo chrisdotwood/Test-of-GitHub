@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace FsmReader {
     public abstract class Composite {
-        public abstract ReadOnlyCollection<Composite> Children {
+        public abstract IEnumerable<Composite> Children {
             get;
         }
 
@@ -39,8 +39,8 @@ namespace FsmReader {
                     }
                 }
 
-                for (int i = firstChild; i < Children.Count; i++) {
-                    Composite c = Children[i];
+                for (int i = firstChild; i < Children.Count(); i++) {
+                    Composite c = Children.ElementAt(i);
 					if (!c.Accept(visitor, inStack, resumeStack)) {
 						inStack.Push(i);
                         break;

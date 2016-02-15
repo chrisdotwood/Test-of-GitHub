@@ -25,8 +25,6 @@ namespace PrintFile {
 					PrintToFile(root);
 				}
 			}
-
-
 		}
 
 		static void PrintToFile(Treenode node) {

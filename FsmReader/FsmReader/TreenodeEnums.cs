@@ -28,6 +28,9 @@ namespace FsmReader {
 		HideConnectors = 0x10,
 		HideLabel = 0x20,
 		ExtendedFlags = 0x40,
+		/// <summary>
+		/// If HasBranch then the node contains other nodes
+		/// </summary>
 		HasBranch = 0x80
 	}
 

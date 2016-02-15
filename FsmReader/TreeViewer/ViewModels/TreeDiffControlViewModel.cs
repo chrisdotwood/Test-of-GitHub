@@ -94,15 +94,7 @@ namespace TreeViewer.ViewModels {
                 Treenode root = null;
 
                 using (FileStream stream = new FileStream(arg.Path, FileMode.Open, FileAccess.Read)) {
-					// TODO Validate preamble
-					// Skip the first 0x48 bytes
-					stream.Position = 0x48;
-
-					using (GZipStream zipStream = new GZipStream(stream, CompressionMode.Decompress)) {
-						//using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\doublenode.t.unzipped", FileMode.Open)) {
-						root = Treenode.Read(zipStream);
-					}
-
+					root = Treenode.Read(stream);
                 }
 
                 if (root != null) {
@@ -410,11 +402,11 @@ namespace TreeViewer.ViewModels {
                 try {
                     string leftEdited = ReadTextFile(state.LeftPath);
                     if (leftEdited != state.LeftTreenode.DataAsString) {
-                        state.LeftTreenode.DataAsString = leftEdited;
+                        //state.LeftTreenode.DataAsString = leftEdited;
                     }
                     string rightEdited = ReadTextFile(state.RightPath);
                     if (rightEdited != state.RightTreenode.DataAsString) {
-                        state.RightTreenode.DataAsString = rightEdited;
+                      //  state.RightTreenode.DataAsString = rightEdited;
                     }
                 } catch (Exception ex) {
                     MessageBox.Show("An error has occurred when loading the changes: " + ex.Message, "Merge Error", MessageBoxButton.OK, MessageBoxImage.Error);

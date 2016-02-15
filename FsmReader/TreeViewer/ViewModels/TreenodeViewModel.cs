@@ -15,17 +15,10 @@ namespace TreeViewer {
 		public TreenodeViewModel Parent { get; set; }
 		public TreenodeViewModel(Treenode node, TreenodeViewModel parent) {
 			this.Treenode = node;
-			// TODO Ensure that TreenodeViews are destroyed when the Treenodes are in existance but the containing TreeView isn't
-			this.Treenode.PropertyChanged += new PropertyChangedEventHandler(Treenode_PropertyChanged);
+
 			this.Parent = parent;
 			foreach (Treenode n in Treenode.Children.Cast<Treenode>()) {
 				children.Add(new TreenodeViewModel(n, this));
-			}
-		}
-
-		~TreenodeViewModel() {
-			if (this.Treenode != null) {
-				this.Treenode.PropertyChanged -= Treenode_PropertyChanged;
 			}
 		}
 
@@ -83,10 +76,6 @@ namespace TreeViewer {
 		public string DataAsString {
 			get {
 				return Treenode.DataAsString;
-			}
-			set {
-				Treenode.DataAsString = value;
-				propertyChangedEvent.Raise(this, new PropertyChangedEventArgs("DataAsString"));
 			}
 		}
 
