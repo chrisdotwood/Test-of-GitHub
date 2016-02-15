@@ -114,7 +114,11 @@ namespace FsmReader {
 		public double DataAsDouble {
 			get {
 				Debug.Assert(DataType == FsmReader.DataType.Float);
-				return BitConverter.ToDouble(Data, 0);
+				if (Data == null) {
+					return 0;
+				} else {
+					return BitConverter.ToDouble(Data, 0);
+				}
 			}
 			set {
 				Debug.Assert(DataType == FsmReader.DataType.Float);

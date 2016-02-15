@@ -14,21 +14,14 @@ namespace PrintFile {
 
 			//using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\cppcodenode.t", FileMode.Open)) {
 			using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\Dose version 8.0.0 minus SSCandC.fsm", FileMode.Open)) {
-				// TODO Validate preamble
-				// Skip the first 0x48 bytes
-				stream.Position = 0x48;
+				root = Treenode.Read(stream);
 
-				using (GZipStream zipStream = new GZipStream(stream, CompressionMode.Decompress)) {
-					//using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\doublenode.t.unzipped", FileMode.Open)) {
-					root = Treenode.Read(zipStream);
-
-					PrintToFile(root);
-				}
+				PrintToFile(root);
 			}
 		}
 
 		static void PrintToFile(Treenode node) {
-			using(Stream fs = File.Create(@"C:\users\chris.wood\desktop\new folder\output.txt")) {
+			using (Stream fs = File.Create(@"C:\users\chris.wood\desktop\new folder\output.txt")) {
 				using (StreamWriter writer = new StreamWriter(fs)) {
 					PrintToFile(writer, new List<Treenode>() { node }, 0);
 				}
@@ -37,15 +30,18 @@ namespace PrintFile {
 
 		static void PrintToFile(StreamWriter writer, IEnumerable<Treenode> nodes, int depth) {
 			foreach (Treenode n in nodes) {
-				for (int i = depth; i > 0; i--) { 
-					writer.Write("-");
+				writer.Write(n.FullPath);
+
+				if(n.DataType == DataType.Float) {
+					writer.Write(n.DataAsDouble.ToString());
 				}
-				writer.WriteLine(" " + n.Title);
-				
-				if(n.NodeChildren.FirstOrDefault() != null) {
+
+				writer.WriteLine();
+
+				if (n.NodeChildren.FirstOrDefault() != null) {
 					PrintToFile(writer, n.NodeChildren, depth + 1);
 				}
-				if(n.DataChildren.FirstOrDefault() != null) {
+				if (n.DataChildren.FirstOrDefault() != null) {
 					PrintToFile(writer, n.DataChildren, depth + 1);
 				}
 			}
