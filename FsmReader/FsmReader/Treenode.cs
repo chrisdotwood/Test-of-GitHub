@@ -12,11 +12,6 @@ namespace FsmReader {
 
 
 	public class Treenode : Composite, INotifyPropertyChanged {
-		public Treenode() {
-			NodeChildren = new Collection<Treenode>();
-			DataChildren = new Collection<Treenode>();
-		}
-
 		private Treenode childSizeNode;
 		private Treenode dataSizeNode;
 
@@ -96,17 +91,23 @@ namespace FsmReader {
 
 		public uint Size;
 
-		//public List<Treenode> dataChildren = new List<Treenode>();
-		public Collection<Treenode> NodeChildren
+		private List<Treenode> _NodeChildren = new List<Treenode>();
+
+		public IEnumerable<Treenode> NodeChildren
 		{
-			get;
-			private set;
+			get
+			{
+				return _NodeChildren;
+			}
 		}
 
-		public Collection<Treenode> DataChildren
+		private List<Treenode> _DataChildren = new List<Treenode>();
+		public IEnumerable<Treenode> DataChildren
 		{
-			get;
-			private set;
+			get
+			{
+				return _DataChildren;
+			}
 		}
 
 		public override ReadOnlyCollection<Composite> Children
@@ -212,8 +213,8 @@ namespace FsmReader {
 		{
 			get
 			{
-				if (index >= NodeChildren.Count) return null;
-				return NodeChildren[index];
+				if (index >= _NodeChildren.Count) return null;
+				return _NodeChildren[index];
 			}
 		}
 
@@ -335,9 +336,8 @@ namespace FsmReader {
 					}
 				}
 
-				// Skip over the next bytesToJump bytes. Not sure why yet.
 				int bytesToJump = reader.ReadInt32();
-				byte[] jumped = reader.ReadBytes(bytesToJump);
+				ret.Data = reader.ReadNullTerminatedString(bytesToJump);
 
 				// The number of object children access with > rather then the normal +
 				int numChildren = reader.ReadInt32();
@@ -346,7 +346,7 @@ namespace FsmReader {
 					Treenode child = _Read(stream, ref count);
 					numChildren--;
 
-					ret.DataChildren.Add(child);
+					ret.AddDataChild(child);
 				}
 
 			} else if (ret.NodeType == DataType.None) {
@@ -355,6 +355,7 @@ namespace FsmReader {
 				int coupling = reader.ReadInt32();
 			} else {
 				//throw new NotImplementedException();
+				Console.WriteLine();
 			}
 
 			if ((ret.Flags & Flags.HasBranch) == Flags.HasBranch) {
@@ -370,19 +371,37 @@ namespace FsmReader {
 				int bytesToJump = reader.ReadInt32();
 				byte[] jumped = reader.ReadBytes(bytesToJump);
 
-				// The number of object children access with the normal +
-				int numChildren = reader.ReadInt32();
+				int numChildren;
+
+				if (unknown[1] == 0x02) {
+					byte[] unknownCppTail = reader.ReadBytes(0x9);
+
+					numChildren = 0;
+				} else {
+					// The number of object children access with the normal +
+					numChildren = reader.ReadInt32();
+				}
 
 				while (numChildren > 0) {
 					Treenode child = _Read(stream, ref count);
 					numChildren--;
 
-					ret.NodeChildren.Add(child);
+					ret.AddNodeChild(child);
 				}
 			}
 
 			return ret;
 
+		}
+
+		private void AddDataChild(Treenode child) {
+			_DataChildren.Add(child);
+			child.Parent = this;
+		}
+
+		private void AddNodeChild(Treenode child) {
+			_NodeChildren.Add(child);
+			child.Parent = this;
 		}
 
 		public static void Write(Treenode root, Stream file) {
@@ -422,9 +441,9 @@ namespace FsmReader {
 			}
 
 			if (root.Branch > 0) {
-				Collection<Treenode> children = root.DataType == DataType.Object ? root.DataChildren : root.NodeChildren;
+				IEnumerable<Treenode> children = root.DataType == DataType.Object ? root.DataChildren : root.NodeChildren;
 
-				root.childSizeNode.Size = (uint)children.Count;
+				root.childSizeNode.Size = (uint)children.Count();
 				Write(root.childSizeNode, file);
 
 				foreach (Treenode child in children) {
@@ -433,7 +452,7 @@ namespace FsmReader {
 			}
 
 			if (root.DataType == DataType.Object) {
-				Collection<Treenode> children;
+				IEnumerable<Treenode> children;
 
 				if (root.Branch == 0) {
 					children = root.DataChildren;
@@ -441,7 +460,7 @@ namespace FsmReader {
 					children = root.NodeChildren;
 				}
 
-				root.dataSizeNode.Size = (uint)children.Count;
+				root.dataSizeNode.Size = (uint)children.Count();
 				Write(root.dataSizeNode, file);
 
 				foreach (Treenode child in children) {

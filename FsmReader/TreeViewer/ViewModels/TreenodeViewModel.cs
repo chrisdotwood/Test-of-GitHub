@@ -157,7 +157,7 @@ namespace TreeViewer {
 				} else if ((Treenode.FlagsExtended & FlagsExtended.Flexscript) == FlagsExtended.Flexscript) {
 					return "/Images/Flexscript.png";
 				} else {
-					if (Treenode.NodeChildren.Count > 0) {
+					if (Treenode.NodeChildren.FirstOrDefault() != null) {
 						return "/Images/Folder.png";
 					} else {
 						return "/Images/Default.png";

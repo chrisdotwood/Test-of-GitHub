@@ -12,7 +12,8 @@ namespace PrintFile {
 		static void Main(string[] args) {
 			Treenode root;
 
-			using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\SORG-002-05-C-004_Saker.fsm", FileMode.Open)) {
+			//using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\cppcodenode.t", FileMode.Open)) {
+			using (FileStream stream = new FileStream(@"C:\users\chris.wood\desktop\new folder\Dose version 8.0.0.fsm", FileMode.Open)) {
 				// TODO Validate preamble
 				// Skip the first 0x48 bytes
 				stream.Position = 0x48;
@@ -43,10 +44,10 @@ namespace PrintFile {
 				}
 				writer.WriteLine(" " + n.Title);
 				
-				if(n.NodeChildren.Count > 0) {
+				if(n.NodeChildren.FirstOrDefault() != null) {
 					PrintToFile(writer, n.NodeChildren, depth + 1);
 				}
-				if(n.DataChildren.Count > 0) {
+				if(n.DataChildren.FirstOrDefault() != null) {
 					PrintToFile(writer, n.DataChildren, depth + 1);
 				}
 			}
